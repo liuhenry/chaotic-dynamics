@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>Sine Demo</title>
+
+    <script type='text/javascript'>
+      const tick = (canvas, s) => {
+        const ctx = canvas.getContext("2d");
+        const canw = canvas.width;
+        const canh = canvas.height;
+
+        ctx.clearRect(0, 0, canw, canh);
+        ctx.beginPath()
+        ctx.moveTo(s.x * (canw / (2 * Math.PI)),
+                   s.y * (canh / 4) + canh / 2);
+        s.tick()
+        if (s.x !== 0 && s.y !== 0) {
+          ctx.lineTo(s.x * (canw / (2 * Math.PI)),
+                    s.y * (canh / 4) + canh / 2);
+        }
+        ctx.stroke();
+
+        requestAnimationFrame(() => { tick(canvas, s) });
+      }
+      
+      var Module = {
+        onRuntimeInitialized: () => { 
+          const canvas = document.getElementById('canvas');
+
+          s = new Module.SineState();
+          tick(canvas, s);
+        }
+      };
+    </script>
+    <script async type="text/javascript" src="sine.js"></script>
+  </head>
+  <body>
+      <canvas id="canvas" width="800px" height="500px"></canvas>
+  </body>
+</html>
