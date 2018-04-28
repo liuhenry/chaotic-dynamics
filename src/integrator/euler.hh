@@ -6,7 +6,10 @@
 #include "integrator.hh"
 
 void forwardEulerStep(DynFun dynFun, double t0, double t1,
-                      std::vector<double> &z0, std::vector<double> &z1,
+                      std::vector<double> &z, std::vector<double> &zNext,
                       int nDim);
+
+void midpointStep(DynFun dynFun, double t0, double t1, std::vector<double> &z,
+                  std::vector<double> &zNext, int nDim);
 
 #endif

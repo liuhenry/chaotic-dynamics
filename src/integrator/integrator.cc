@@ -6,6 +6,7 @@
 
 #include "euler.hh"
 
+
 /* Example Systems */
 
 void exponential(double t, const std::vector<double> &z, std::vector<double> &dz) {
@@ -33,7 +34,7 @@ int main() {
 
   for (double t = tS; t <= tE; t += step) {
     std::cout << t << "\t" << exp(t) << "\t" << z0[0] << std::endl;
-    forwardEulerStep(exponential, t, step, z0, z1, 1);
+    midpointStep(exponential, t, step, z0, z1, 1);
     z0 = z1;
   }
 }
