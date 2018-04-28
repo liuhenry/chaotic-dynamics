@@ -2,14 +2,14 @@
 #define __EULER_INTEGRATOR_H__
 
 #include <vector>
+using std::vector;
 
 #include "integrator.hh"
 
-void forwardEulerStep(DynFun dynFun, double t0, double t1,
-                      std::vector<double> &z, std::vector<double> &zNext,
-                      int nDim);
+vector<double> forwardEulerStep(DynFun dynFun, double t0, double dt,
+                                const vector<double> &z, int nDim);
 
-void midpointStep(DynFun dynFun, double t0, double t1, std::vector<double> &z,
-                  std::vector<double> &zNext, int nDim);
+vector<double> midpointStep(DynFun dynFun, double t0, double dt,
+                            const vector<double> &z, int nDim);
 
 #endif

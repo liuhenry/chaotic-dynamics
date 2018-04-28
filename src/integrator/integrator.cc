@@ -1,40 +1,38 @@
 #include "integrator.hh"
 
-#include <vector>
 #include <cmath>
 #include <iostream>
+#include <vector>
+using std::vector;
 
 #include "euler.hh"
 
-
 /* Example Systems */
 
-void exponential(double t, const std::vector<double> &z, std::vector<double> &dz) {
-  auto x = z[0];
-  auto dx = x;
-  dz[0] = dx;
+auto exponential(double t, const vector<double> &z) {
+  // x' = x
+  const double &x = z[0];
+  double dx = x;
+  return vector<double>{dx};
 }
 
-void simpleHarmonicOscillator(double t, const std::vector<double> &z,
-                              std::vector<double> &dz) {
+auto simpleHarmonicOscillator(double t, const vector<double> &z) {
   // x'' = -x
-  // -> x' = v
-  //    v' = -x
-  auto x = z[0], v = z[1];
-  auto dx = v, dv = -x;
-  dz[0] = dx;
-  dz[1] = dv;
+  // becomes:
+  // x' = v
+  // v' = -x
+  const double &x = z[0], &v = z[1];
+  double dx = v, dv = -x;
+  return vector<double>{dx, dv};
 }
 
 int main() {
-  double tS = 0, tE = 4, step = 0.25;
+  double tS = 0, tE = 4, step = 1;
 
-  std::vector<double> z0 = {1};
-  std::vector<double> z1(1);
+  vector<double> z = {1};
 
   for (double t = tS; t <= tE; t += step) {
-    std::cout << t << "\t" << exp(t) << "\t" << z0[0] << std::endl;
-    midpointStep(exponential, t, step, z0, z1, 1);
-    z0 = z1;
+    std::cout << t << "\t" << exp(t) << "\t" << z[0] << std::endl;
+    z = forwardEulerStep(exponential, t, step, z, 1);
   }
 }
