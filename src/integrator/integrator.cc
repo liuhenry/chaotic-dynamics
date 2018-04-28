@@ -6,6 +6,7 @@
 using std::vector;
 
 #include "euler.hh"
+#include "rk4.hh"
 
 /* Example Systems */
 
@@ -33,6 +34,6 @@ int main() {
 
   for (double t = tS; t <= tE; t += step) {
     std::cout << t << "\t" << exp(t) << "\t" << z[0] << std::endl;
-    z = forwardEulerStep(exponential, t, step, z, 1);
+    z = rangeKutta4Step(exponential, t, step, z);
   }
 }

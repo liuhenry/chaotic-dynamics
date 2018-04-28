@@ -1,5 +1,5 @@
-#ifndef __EULER_INTEGRATOR_H__
-#define __EULER_INTEGRATOR_H__
+#ifndef __INTEGRATOR_EULER_H__
+#define __INTEGRATOR_EULER_H__
 
 #include <vector>
 using std::vector;
@@ -7,9 +7,9 @@ using std::vector;
 #include "integrator.hh"
 
 vector<double> forwardEulerStep(DynFun dynFun, double t0, double dt,
-                                const vector<double> &z, int nDim);
+                                const vector<double> &z);
 
 vector<double> midpointStep(DynFun dynFun, double t0, double dt,
-                            const vector<double> &z, int nDim);
+                            const vector<double> &z);
 
 #endif
