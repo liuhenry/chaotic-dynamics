@@ -4,7 +4,7 @@
 using std::vector;
 
 vector<double> forwardEulerStep(DynFun dynFun, double t, double dt,
-                                const std::vector<double> &z) {
+                                const vector<double> &z) {
   vector<double> zRet(z.size());
 
   // z_{n+1} = z_n + dt * f(t, z_n)

@@ -28,12 +28,12 @@ auto simpleHarmonicOscillator(double t, const vector<double> &z) {
 }
 
 int main() {
-  double tS = 0, tE = 4, step = 1;
+  double tS = 0, tE = 10, step = 0.0001;
 
-  vector<double> z = {1};
+  vector<double> z = {1, 0};
 
   for (double t = tS; t <= tE; t += step) {
-    std::cout << t << "\t" << exp(t) << "\t" << z[0] << std::endl;
-    z = rangeKutta4Step(exponential, t, step, z);
+    std::cout << t << "\t" << cos(t) << "\t" << z[0] << std::endl;
+    z = rangeKutta4Step(simpleHarmonicOscillator, t, step, z);
   }
 }
