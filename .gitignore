@@ -2,3 +2,5 @@
 .DS_Store
 *.out
 *.out.dSYM
+dist/
+node_modules/

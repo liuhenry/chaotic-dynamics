@@ -1,0 +1,26 @@
+{
+  "name": "chaotic-dynamics",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {},
+  "devDependencies": {
+    "typescript": "^2.8.3",
+    "webpack": "^4.8.1",
+    "webpack-cli": "^2.1.3"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "github:liuhenry/chaotic-dynamics"
+  },
+  "keywords": [],
+  "author": "Henry Liu <henry@liuhenry.com>",
+  "license": "",
+  "bugs": {
+    "url": "https://github.com/liuhenry/chaotic-dynamics/issues"
+  },
+  "homepage": "https://github.com/liuhenry/chaotic-dynamics#readme"
+}
