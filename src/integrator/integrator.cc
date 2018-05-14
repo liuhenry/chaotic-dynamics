@@ -1,39 +1,41 @@
 #include "integrator.hh"
 
-#include <cmath>
-#include <iostream>
 #include <vector>
 using std::vector;
 
 #include "euler.hh"
 #include "rk4.hh"
 
-/* Example Systems */
+// Private
 
-auto exponential(double t, const vector<double> &z) {
-  // x' = x
-  const double &x = z[0];
-  double dx = x;
-  return vector<double>{dx};
-}
-
-auto simpleHarmonicOscillator(double t, const vector<double> &z) {
-  // x'' = -x
-  // becomes:
-  // x' = v
-  // v' = -x
-  const double &x = z[0], &v = z[1];
-  double dx = v, dv = -x;
-  return vector<double>{dx, dv};
-}
-
-int main() {
-  double tS = 0, tE = 10, step = 0.0001;
-
-  vector<double> z = {1, 0};
-
-  for (double t = tS; t <= tE; t += step) {
-    std::cout << t << "\t" << cos(t) << "\t" << z[0] << std::endl;
-    z = rangeKutta4Step(simpleHarmonicOscillator, t, step, z);
+void Integrator::setMethod(IntegrationMethod method) {
+  switch (method) {
+    case Euler:
+      _integrationStep = forwardEulerStep;
+    case Midpoint:
+      _integrationStep = midpointStep;
+    case RungeKutta:
+      _integrationStep = rungeKutta4Step;
   }
+}
+
+// Public
+
+Integrator::Integrator(DynFun dynFun, vector<double> initials,
+                       IntegrationMethod method)
+    : _dynFun(dynFun), _state(initials) {
+  this->setMethod(method);
+}
+
+vector<double> &Integrator::step(double t, double step) {
+  _state = _integrationStep(_dynFun, t, step, _state);
+  return _state;
+}
+
+const vector<double> &Integrator::state() const {
+  return _state;
+}
+
+double Integrator::operator[](std::size_t idx) {
+  return _state[idx];
 }

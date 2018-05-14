@@ -3,7 +3,7 @@
 #include <vector>
 using std::vector;
 
-vector<double> rangeKutta4Step(DynFun dynFun, double t, double dt,
+vector<double> rungeKutta4Step(DynFun dynFun, double t, double dt,
                                const std::vector<double> &z) {
   const size_t nDim = z.size();
   vector<double> zRet(nDim), z2(nDim), z3(nDim), z4(nDim);
