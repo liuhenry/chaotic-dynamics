@@ -23,7 +23,7 @@ void Integrator::setMethod(IntegrationMethod method) {
 
 Integrator::Integrator(DynFun dynFun, vector<double> initials,
                        IntegrationMethod method)
-    : _dynFun(dynFun), _state(initials) {
+    : _state(initials), _dynFun(dynFun) {
   this->setMethod(method);
 }
 
