@@ -26,8 +26,7 @@ class Integrator {
   Integrator(DynFun, vector<double>, IntegrationMethod=RungeKutta);
   
   vector<double> &step(double, double);
-  double operator[](std::size_t);
-  const vector<double> &state() const;
+  double operator[](std::size_t) const;
 };
 
 #endif

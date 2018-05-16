@@ -32,10 +32,6 @@ vector<double> &Integrator::step(double t, double step) {
   return _state;
 }
 
-const vector<double> &Integrator::state() const {
-  return _state;
-}
-
-double Integrator::operator[](std::size_t idx) {
+double Integrator::operator[](std::size_t idx) const {
   return _state[idx];
 }
