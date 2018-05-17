@@ -9,7 +9,23 @@ using std::vector;
 #include <emscripten/bind.h>
 #endif
 
-vector<double> eom(double t, const vector<double> &z) {
+class SimplePendulum {
+  int _t;
+  Integrator _integrator;
+
+  static vector<double> eom(double, const vector<double> &);
+
+ public:
+  SimplePendulum(double angle)
+      : _t(0), _integrator(SimplePendulum::eom, {angle, 0}){}
+
+  double theta() const { return _integrator[0]; }
+  double omega() const { return _integrator[1]; }
+
+  void tick();
+};
+
+vector<double> SimplePendulum::eom(double t, const vector<double> &z) {
   // theta'' = -sin(theta)
   // becomes:
   // theta' = omega
@@ -18,20 +34,6 @@ vector<double> eom(double t, const vector<double> &z) {
   double dtheta = omega, domega = -sin(theta);
   return vector<double>{dtheta, domega};
 }
-
-class SimplePendulum {
-  int _t;
-  Integrator _integrator;
-
- public:
-  SimplePendulum(double angle)
-      : _t(0), _integrator(eom, {angle, 0}){}
-
-  double theta() const { return _integrator[0]; }
-  double omega() const { return _integrator[1]; }
-
-  void tick();
-};
 
 void SimplePendulum::tick() {
   for (int i = 0; i < 5; i ++) {
