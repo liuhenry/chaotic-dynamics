@@ -64,7 +64,7 @@ export default class PendulumVisualization extends Canvas {
     } else {
       this.ctx.strokeStyle = 'red';
       this.ctx.fillStyle = 'red';
-      this.ctx.arc(theta * 25 + 650, omega * 25 + 125, 0.01, 0, 2 * Math.PI);
+      this.ctx.arc(theta * 25 + 650, omega * 25 + 125, 0.1, 0, 2 * Math.PI);
     }
     this.ctx.fill();
     this.ctx.stroke();

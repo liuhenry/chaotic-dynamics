@@ -1,4 +1,12 @@
+import * as React from 'react';
+
 import PendulumVisualization from './canvas/pendulum_visualization';
+
+
+interface CanvasProps {
+  width?: number;
+  height?: number;
+}
 
 
 (window as any).Module = {
@@ -7,7 +15,7 @@ import PendulumVisualization from './canvas/pendulum_visualization';
   },
 
   onRuntimeInitialized(): void {
-    const canvas1 = <HTMLCanvasElement> document.getElementById('canvas1');
+    const canvas1 = document.getElementById('canvas') as HTMLCanvasElement;
     const sim1 = new (window as any).Module.Pendulum(179 * Math.PI / 180);
     const viz1 = new PendulumVisualization(canvas1, sim1);
 
@@ -15,3 +23,9 @@ import PendulumVisualization from './canvas/pendulum_visualization';
     viz1.tick();
   }
 };
+
+export default class Canvas extends React.Component<CanvasProps, {}> {
+  render() {
+    return <canvas id="canvas" width="800px" height="500px"></canvas>;
+  }
+}

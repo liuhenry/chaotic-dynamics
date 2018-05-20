@@ -3,9 +3,12 @@
       "outDir": "./dist",
       "sourceMap": true,
       "strict": true,
-      "target": "es5",
+      "target": "es6",
       "module": "commonjs",
-      "allowJs": true
+      "jsx": "preserve"
+  },
+  "awesomeTypescriptLoaderOptions": {
+      "useBabel": true,
   },
   "include": [
       "./src/js/**/*"
