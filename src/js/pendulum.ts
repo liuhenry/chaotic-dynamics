@@ -28,7 +28,7 @@ function tick(canvas: HTMLCanvasElement, s: module.Simulation): void {
 
 (window as any).Module = {
   locateFile(file: string): string {
-    return './' + file;
+    return './assets/js/' + file;
   },
 
   onRuntimeInitialized(): void {

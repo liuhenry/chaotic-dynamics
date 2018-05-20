@@ -4,7 +4,7 @@ module.exports = {
   entry: './src/js/pendulum.ts',
   output: {
     filename: 'pendulum.js',
-    path: path.resolve(__dirname, 'dist')
+    path: path.resolve(__dirname, 'dist/assets/js/')
   },
 
   devtool: 'source-map',
