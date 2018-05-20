@@ -7,6 +7,7 @@ using std::vector;
 #include "integrator.hh"
 
 vector<double> symplecticEulerStep(DynFun dynFun, double t0, double dt,
+                                   const vector<double> &params,
                                    const vector<double> &z);
 
 #endif

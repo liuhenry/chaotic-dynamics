@@ -9,8 +9,10 @@ using std::vector;
 // first order equations by change of variables.
 //
 //
-typedef vector<double> (*DynFun)(double t, const vector<double> &z);
+typedef vector<double> (*DynFun)(double t, const vector<double> &params,
+                                 const vector<double> &z);
 typedef vector<double> (*IntegrationStep)(DynFun, double, double,
+                                          const vector<double> &,
                                           const vector<double> &);
 
 enum IntegrationMethod { Euler, Midpoint, RungeKutta };
@@ -23,9 +25,9 @@ class Integrator {
   void setMethod(IntegrationMethod);
 
  public:
-  Integrator(DynFun, vector<double>, IntegrationMethod=RungeKutta);
-  
-  vector<double> &step(double, double);
+  Integrator(DynFun, vector<double>, IntegrationMethod = RungeKutta);
+
+  vector<double> &step(double, double, const vector<double> &);
   double operator[](std::size_t) const;
 };
 

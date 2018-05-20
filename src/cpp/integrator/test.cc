@@ -6,14 +6,16 @@ using std::vector;
 #include "integrator.hh"
 
 /* Example Systems */
-auto exponential(double t, const vector<double> &z) {
+auto exponential(double t, const vector<double> &params,
+                 const vector<double> &z) {
   // x' = x
   const double &x = z[0];
   double dx = x;
   return vector<double>{dx};
 }
 
-auto simpleHarmonicOscillator(double t, const vector<double> &z) {
+auto simpleHarmonicOscillator(double t, const vector<double> &params,
+                              const vector<double> &z) {
   // x'' = -x
   // becomes:
   // x' = v
@@ -30,6 +32,6 @@ int main() {
 
   for (double t = tS; t <= tE; t += step) {
     std::cout << t << "\t" << cos(t) << "\t" << integrator[0] << std::endl;
-    integrator.step(t, step);
+    integrator.step(t, step, {});
   }
 }

@@ -27,8 +27,8 @@ Integrator::Integrator(DynFun dynFun, vector<double> initials,
   this->setMethod(method);
 }
 
-vector<double> &Integrator::step(double t, double step) {
-  _state = _integrationStep(_dynFun, t, step, _state);
+vector<double> &Integrator::step(double t, double step, const vector<double> &params) {
+  _state = _integrationStep(_dynFun, t, step, params, _state);
   return _state;
 }
 
