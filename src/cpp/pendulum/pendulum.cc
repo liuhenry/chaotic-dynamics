@@ -25,7 +25,7 @@ class Pendulum {
 
  public:
   Pendulum(double theta, double omega)
-      : _t(0), _integrator(Pendulum::eom, {theta, omega}), _phase_history(500) {}
+      : _t(0), _integrator(Pendulum::eom, {theta, omega}), _phase_history() {}
 
   double theta() const { return _integrator[0]; }
   double omega() const { return _integrator[1]; }

@@ -1,3 +1,5 @@
+import { ParameterAction } from '../types/index';
+
 export const Actions = {
   RUN_SIMULATION: 'RUN_SIMULATION',
   CHANGE_DAMPING: 'CHANGE_DAMPING'
@@ -9,7 +11,7 @@ export function runSimulation() {
   };
 }
 
-export function changeDamping(value: number): reduxSimulation.ParameterAction {
+export function changeDamping(value: number): ParameterAction {
   return {
     type: Actions.CHANGE_DAMPING,
     value

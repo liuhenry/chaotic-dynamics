@@ -2,12 +2,16 @@ import { combineReducers } from 'redux';
 import {
   Actions
 } from '../actions/simulation'
+import {
+  BaseAction,
+  ParameterAction
+} from '../types/index';
 
-const initialState = {
+const initialSimulation = {
   running: false
 };
 
-function state(state = initialState, action: reduxSimulation.BaseAction) {
+function simulation(state = initialSimulation, action: BaseAction) {
   switch(action.type) {
     case Actions.RUN_SIMULATION:
       return {
@@ -23,7 +27,7 @@ const initialParameters = {
   damping: 0
 };
 
-function parameters(state = initialParameters, action: reduxSimulation.ParameterAction) {
+function parameters(state = initialParameters, action: ParameterAction) {
   switch (action.type) {
     case Actions.CHANGE_DAMPING:
       return {
@@ -36,6 +40,6 @@ function parameters(state = initialParameters, action: reduxSimulation.Parameter
 }
 
 export default combineReducers({
-  state,
+  simulation,
   parameters
 })

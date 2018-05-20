@@ -26,7 +26,7 @@ export default class PendulumVisualization extends Canvas {
 
   stop() {
     this.running = false;
-    cancelAnimationFrame(this.animationID);
+    cancelAnimationFrame(this.animationID as number);
   }
 
   setParameters(damping: number) {
@@ -70,25 +70,39 @@ export default class PendulumVisualization extends Canvas {
 
   drawPhaseHistory() {
     const { theta, omega } = this.simulation;
+    const [x, y] = [theta * 25 + 650, omega * 25 + 125];
     this.clearUpperRight();
-    for (let i = this.simulation.historySize; i > 0; i--) {
-      this.drawPhasePoint(this.simulation.theta_idx(i), this.simulation.omega_idx(i));
+    this.ctx.beginPath();
+    this.ctx.moveTo(x, y);
+    for (let i = 1; i < this.simulation.historySize; i++) {
+      const [x, y] = [
+        this.simulation.theta_idx(i) * 25 + 650,
+        this.simulation.omega_idx(i) * 25 + 125
+      ];
+      this.drawPhasePoint(x, y, {connect: true});
     }
-    this.drawPhasePoint(theta, omega, true);
+    this.ctx.stroke();
+    this.drawPhasePoint(x, y, {current: true});
   }
 
-  drawPhasePoint(theta: number, omega: number, current = false) {
-    this.ctx.beginPath();
+  drawPhasePoint(x: number, y: number, {current = false, connect = false}) {
     if (current) {
       this.ctx.strokeStyle = 'black';
       this.ctx.fillStyle = 'black';
-      this.ctx.arc(theta * 25 + 650, omega * 25 + 125, 2, 0, 2 * Math.PI);
+      var size = 2;
     } else {
       this.ctx.strokeStyle = 'red';
       this.ctx.fillStyle = 'red';
-      this.ctx.arc(theta * 25 + 650, omega * 25 + 125, 0.1, 0, 2 * Math.PI);
+      var size = 0.1;
     }
-    this.ctx.fill();
-    this.ctx.stroke();
+    if (current) {
+      this.ctx.beginPath();
+      this.ctx.arc(x, y, size, 0, 2 * Math.PI);
+      this.ctx.fill();
+      this.ctx.stroke();
+    } else {
+      this.ctx.lineTo(x, y);
+    }
+
   }
 }

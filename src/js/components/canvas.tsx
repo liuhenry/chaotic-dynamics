@@ -1,15 +1,10 @@
 import * as React from 'react';
 import { connect } from 'react-redux';
 
+import { StoreState } from '../types/index';
 import { runSimulation } from '../actions/simulation';
 import store from '../stores/simulation';
 import PendulumVisualization from '../canvas/pendulum_visualization';
-
-
-interface CanvasProps {
-  width?: number;
-  height?: number;
-}
 
 
 (window as any).Module = {
@@ -25,23 +20,37 @@ interface CanvasProps {
   }
 };
 
-class Canvas extends React.Component<CanvasProps> {
-  state: {
-    canvas?: HTMLCanvasElement;
-    model?: module.PendulumSimulation;
-    simulation?: PendulumVisualization;
+interface Props {
+  width?: number;
+  height?: number;
+  running: boolean;
+  parameters: {
+    damping: number
+  };
+}
+
+interface State {
+  canvas?: HTMLCanvasElement;
+  model?: module.PendulumSimulation;
+  simulation?: PendulumVisualization;
+}
+
+class Canvas extends React.Component<Props, State> {
+  constructor(props: Props) {
+    super(props);
+    this.state = {};
   }
 
   componentDidMount() {
     this.setState({
-      canvas: document.getElementById('canvas')
+      canvas: document.getElementById('canvas') as HTMLCanvasElement
     });
   }
 
-  componentDidUpdate(prevProps) {
+  componentDidUpdate(prevProps: Props) {
     if (this.props.running) {
-      if (this.state.model === undefined) {
-        const model = new (window as any).Module.Pendulum(179 * Math.PI / 180, 1);
+      if (!this.state.model && this.state.canvas) {
+        const model = new (window as any).Module.Pendulum(179 * Math.PI / 180, 0);
         const simulation = new PendulumVisualization(this.state.canvas, model);
         simulation.initialize();
         simulation.setParameters(this.props.parameters.damping);
@@ -51,8 +60,10 @@ class Canvas extends React.Component<CanvasProps> {
           simulation
         });
       } else {
-        if (JSON.stringify(this.props.parameters) !== JSON.stringify(prevProps.parameters)) {
-          this.state.simulation.setParameters(this.props.parameters.damping);
+        if (!!this.state.simulation) {
+          if (JSON.stringify(this.props.parameters) !== JSON.stringify(prevProps.parameters)) {
+            this.state.simulation.setParameters(this.props.parameters.damping);
+          }
         }
       }
     }
@@ -63,9 +74,9 @@ class Canvas extends React.Component<CanvasProps> {
   }
 }
 
-function mapStateToProps(state) {
+function mapStateToProps(state: StoreState) {
   return {
-    running: state.state.running,
+    running: state.simulation.running,
     parameters: state.parameters
   };
 }

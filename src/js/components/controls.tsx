@@ -1,15 +1,21 @@
 import * as React from 'react';
-import { connect } from 'react-redux';
+import { Dispatch, connect } from 'react-redux';
 import Slider from 'rc-slider';
 
+import { StoreState } from '../types/index';
 import { changeDamping } from '../actions/simulation';
 
 import 'rc-slider/assets/index.css';
 
 
-class Controls extends React.Component {
+interface Props {
+  damping: number;
+  onDampingChange(value: number): void;
+}
+
+class Controls extends React.Component<Props> {
   handleChange(value: number) {
-    this.props.dispatch(changeDamping(Number(Math.round(Number(value + 'e3')) + 'e-3')));
+    this.props.onDampingChange(value);
   }
 
   render() {
@@ -30,8 +36,18 @@ class Controls extends React.Component {
   }
 }
 
-function mapStateToProps(state) {
-  return {damping: state.parameters.damping};
+function mapStateToProps(state: StoreState) {
+  return {
+    damping: state.parameters.damping
+  };
 }
 
-export default connect(mapStateToProps)(Controls)
+function mapDispatchToProps(dispatch: Dispatch) {
+  return {
+    onDampingChange(value: number) {
+      dispatch(changeDamping(Number(Math.round(Number(value + 'e3')) + 'e-3')));
+    }
+  };
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Controls)
