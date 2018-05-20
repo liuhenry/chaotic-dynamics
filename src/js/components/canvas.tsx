@@ -44,16 +44,15 @@ class Canvas extends React.Component<CanvasProps> {
         const model = new (window as any).Module.Pendulum(179 * Math.PI / 180);
         const simulation = new PendulumVisualization(this.state.canvas, model);
         simulation.initialize();
-        const animationID = simulation.start(this.props.parameters);
+        simulation.setParameters(this.props.parameters.damping);
+        const animationID = simulation.start();
         this.setState({
           model,
           simulation
         });
       } else {
         if (JSON.stringify(this.props.parameters) !== JSON.stringify(prevProps.parameters)) {
-          console.log('updating');
-          this.state.simulation.stop();
-          this.state.simulation.start(this.props.parameters);
+          this.state.simulation.setParameters(this.props.parameters.damping);
         }
       }
     }

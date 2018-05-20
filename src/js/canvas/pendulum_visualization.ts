@@ -5,11 +5,13 @@ export default class PendulumVisualization extends Canvas {
   simulation: module.PendulumSimulation;
   running: boolean;
   animationID?: number;
+  damping: number;
 
   constructor(canvas: HTMLCanvasElement, simulation: module.PendulumSimulation) {
     super(canvas);
     this.simulation = simulation;
     this.running = false;
+    this.damping = 0;
   }
 
   initialize() {
@@ -17,9 +19,9 @@ export default class PendulumVisualization extends Canvas {
     this.drawBoundaries();
   }
 
-  start({damping}: {damping: number}) {
+  start() {
     this.running = true;
-    this.animationID = this.tick({damping});
+    this.animationID = this.tick();
   }
 
   stop() {
@@ -27,15 +29,19 @@ export default class PendulumVisualization extends Canvas {
     cancelAnimationFrame(this.animationID);
   }
 
-  tick({damping}: {damping: number}): number | undefined {
+  setParameters(damping: number) {
+    this.damping = damping;
+  }
+
+  tick(): number | undefined {
     this.clearLeft();
 
     this.drawPendulum();
     this.drawPhaseHistory();
 
-    this.simulation.tick(damping);
+    this.simulation.tick(this.damping);
     if (this.running) {
-      return requestAnimationFrame(() => { this.tick({damping}) });
+      return requestAnimationFrame(() => { this.tick() });
     } else {
       return undefined;
     }
