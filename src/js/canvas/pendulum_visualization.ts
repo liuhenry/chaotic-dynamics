@@ -70,29 +70,39 @@ export default class PendulumVisualization extends Canvas {
 
   drawPhaseHistory() {
     const { theta, omega } = this.simulation;
-    const [x, y] = [theta * 25 + 650, omega * 25 + 125];
+    const scale = 290 / (4*Math.PI);
     this.clearUpperRight();
+
     this.ctx.beginPath();
-    this.ctx.moveTo(x, y);
+    var [lastT, lastO] = [theta, omega];
     for (let i = 1; i < this.simulation.historySize; i++) {
-      const [x, y] = [
-        this.simulation.theta_idx(i) * 25 + 650,
-        this.simulation.omega_idx(i) * 25 + 125
+      const [thisT, thisO] = [
+        this.simulation.theta_idx(i),
+        this.simulation.omega_idx(i)
       ];
+      const [x, y] = [thisT * scale + 650, thisO * scale + 125];
+      if ((lastO > 0 && thisT - lastT > 0) || (lastO < 0 && thisT - lastT < 0) ) {
+        // Dont connect wrapped points
+        this.ctx.stroke();
+        this.ctx.beginPath();
+      }
       this.drawPhasePoint(x, y, {connect: true});
+      [lastT, lastO] = [thisT, thisO];
     }
     this.ctx.stroke();
+
+    const [x, y] = [theta * scale + 650, omega * scale + 125];
     this.drawPhasePoint(x, y, {current: true});
   }
 
   drawPhasePoint(x: number, y: number, {current = false, connect = false}) {
     if (current) {
-      this.ctx.strokeStyle = 'black';
-      this.ctx.fillStyle = 'black';
-      var size = 2;
-    } else {
       this.ctx.strokeStyle = 'red';
       this.ctx.fillStyle = 'red';
+      var size = 2;
+    } else {
+      this.ctx.strokeStyle = 'black';
+      this.ctx.fillStyle = 'black';
       var size = 0.1;
     }
     if (current) {

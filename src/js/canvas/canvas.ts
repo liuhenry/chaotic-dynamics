@@ -16,6 +16,7 @@ export default class Canvas {
   }
 
   drawBoundaries() {
+    this.ctx.strokeStyle = 'grey';
     this.ctx.beginPath();
     this.ctx.moveTo(500, 0);
     this.ctx.lineTo(500, 500);
