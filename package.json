@@ -4,13 +4,14 @@
   "description": "",
   "private": true,
   "dependencies": {
+    "rc-slider": "^8.6.1",
     "react": "^16.3.2",
     "react-dom": "^16.3.2",
-    "react-rangeslider": "^2.2.0",
     "react-redux": "^5.0.7",
     "redux": "^4.0.0"
   },
   "devDependencies": {
+    "@types/rc-slider": "^8.2.3",
     "@types/react": "^16.3.14",
     "@types/react-dom": "^16.0.5",
     "@types/react-redux": "^6.0.0",

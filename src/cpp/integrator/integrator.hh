@@ -29,6 +29,7 @@ class Integrator {
 
   vector<double> &step(double, double, const vector<double> &);
   double operator[](std::size_t) const;
+  double &operator[](std::size_t);
 };
 
 #endif

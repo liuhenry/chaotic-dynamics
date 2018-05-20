@@ -24,8 +24,8 @@ class Pendulum {
                             const vector<double> &);
 
  public:
-  Pendulum(double angle)
-      : _t(0), _integrator(Pendulum::eom, {angle, 0}), _phase_history(500) {}
+  Pendulum(double theta, double omega)
+      : _t(0), _integrator(Pendulum::eom, {theta, omega}), _phase_history(500) {}
 
   double theta() const { return _integrator[0]; }
   double omega() const { return _integrator[1]; }
@@ -53,7 +53,14 @@ void Pendulum::tick(double damping=0) {
     _integrator.step(_t, 0.01, {damping});
   }
 
-  _phase_history.push_front({_integrator[0], _integrator[1]});
+  double theta = _integrator[0];
+  double omega = _integrator[1];
+
+  theta = -M_PI + fmod(M_PI*2 + fmod(theta+M_PI, M_PI*2), M_PI*2);
+
+  _integrator[0] = theta;
+
+  _phase_history.push_front({theta, omega});
   if (_phase_history.size() > 500) {
     _phase_history.pop_back();
   }
@@ -62,7 +69,7 @@ void Pendulum::tick(double damping=0) {
 #ifdef __EMSCRIPTEN__
 EMSCRIPTEN_BINDINGS(pendulum) {
   emscripten::class_<Pendulum>("Pendulum")
-      .constructor<double>()
+      .constructor<double, double>()
       .function("tick", &Pendulum::tick)
       .property("theta", select_overload<double() const>(&Pendulum::theta))
       .property("omega", select_overload<double() const>(&Pendulum::omega))

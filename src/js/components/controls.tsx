@@ -1,15 +1,15 @@
 import * as React from 'react';
 import { connect } from 'react-redux';
-import Slider from 'react-rangeslider';
+import Slider from 'rc-slider';
 
 import { changeDamping } from '../actions/simulation';
 
-import 'react-rangeslider/lib/index.css'
+import 'rc-slider/assets/index.css';
 
 
 class Controls extends React.Component {
   handleChange(value: number) {
-    this.props.dispatch(changeDamping(Number(Math.round(Number(value + 'e2')) + 'e-2')));
+    this.props.dispatch(changeDamping(Number(Math.round(Number(value + 'e3')) + 'e-3')));
   }
 
   render() {
@@ -19,9 +19,9 @@ class Controls extends React.Component {
         <Slider
           min={0}
           max={1}
-          step={0.1}
-          tooltip={false}
+          step={0.01}
           value={damping}
+          marks={{0: 'No Damping'}}
           onChange={this.handleChange.bind(this)}
         />
         {damping}

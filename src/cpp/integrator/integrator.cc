@@ -35,3 +35,7 @@ vector<double> &Integrator::step(double t, double step, const vector<double> &pa
 double Integrator::operator[](std::size_t idx) const {
   return _state[idx];
 }
+
+double &Integrator::operator[](std::size_t idx) {
+  return _state[idx];
+}
