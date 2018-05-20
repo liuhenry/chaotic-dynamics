@@ -56,7 +56,8 @@ void Pendulum::tick(double damping=0) {
   double theta = _integrator[0];
   double omega = _integrator[1];
 
-  theta = -M_PI + fmod(M_PI*2 + fmod(theta+M_PI, M_PI*2), M_PI*2);
+  // https://stackoverflow.com/questions/4633177/c-how-to-wrap-a-float-to-the-interval-pi-pi
+  theta = -M_PI*2 + fmod(M_PI*4 + fmod(theta+M_PI*2, M_PI*4), M_PI*4);
 
   _integrator[0] = theta;
 

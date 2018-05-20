@@ -41,7 +41,7 @@ class Canvas extends React.Component<CanvasProps> {
   componentDidUpdate(prevProps) {
     if (this.props.running) {
       if (this.state.model === undefined) {
-        const model = new (window as any).Module.Pendulum(179 * Math.PI / 180, 2);
+        const model = new (window as any).Module.Pendulum(179 * Math.PI / 180, 1);
         const simulation = new PendulumVisualization(this.state.canvas, model);
         simulation.initialize();
         simulation.setParameters(this.props.parameters.damping);
