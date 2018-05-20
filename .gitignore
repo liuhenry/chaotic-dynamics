@@ -4,5 +4,4 @@
 *.out.dSYM
 *.wasm
 *.o
-dist/
 node_modules/

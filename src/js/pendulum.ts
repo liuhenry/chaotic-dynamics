@@ -6,16 +6,15 @@ function tick(canvas: HTMLCanvasElement, s: module.Simulation): void {
   const canh = canvas.height;
   
   const {theta, omega} = s;
-  console.log('tick');
   if (theta == null || omega == null) {
-    throw("Mission simulation properties!");
+    throw("Missing simulation properties!");
   }
   
-  CanvasUtils.clearAll(ctx);
+  CanvasUtils.clearLeft(ctx);
   
   // Phase diagram, upper right
   ctx.beginPath();
-  ctx.arc(theta * 25 + 650, omega * 25 + 125, 1, 0, 2*Math.PI);
+  ctx.arc(theta * 25 + 650, omega * 25 + 125, 0.01, 0, 2*Math.PI);
   ctx.fillStyle = 'red';
   ctx.fill();
   ctx.strokeStyle = 'red';
@@ -28,11 +27,15 @@ function tick(canvas: HTMLCanvasElement, s: module.Simulation): void {
 }
 
 (window as any).Module = {
+  locateFile(file: string): string {
+    return './' + file;
+  },
+
   onRuntimeInitialized(): void {
     const canvas1 = <HTMLCanvasElement> document.getElementById('canvas1');
     CanvasUtils.prepCanvas(canvas1);
 
-    const p1 = new (window as any).Module.DampedPendulum(45 * Math.PI / 180);
+    const p1 = new (window as any).Module.SimplePendulum(45 * Math.PI / 180);
     tick(canvas1, p1);
   }
 };
