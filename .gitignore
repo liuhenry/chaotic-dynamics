@@ -4,3 +4,4 @@
 *.out.dSYM
 *.o
 node_modules/
+dist/
