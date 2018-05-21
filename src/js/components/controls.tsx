@@ -73,11 +73,18 @@ class Controls extends React.Component<Props, State> {
         <div className="tc pb3">
           Starting Angle
           <div className="flex items-center">
-          <div className="fl w-10 pa2">{theta}</div>
+          <div className="fl w-10 pa2 pl0">{theta}</div>
           <div className="fl w-90 pa2 pl3">
             <Slider
               min={-180}
               max={180}
+              marks={{
+                '-180': '-180',
+                '-90': '-90',
+                '0': '0',
+                '90': '90',
+                '180': '180'
+              }}
               value={theta}
               onChange={this.props.onThetaChange.bind(this)}
             />
@@ -87,11 +94,20 @@ class Controls extends React.Component<Props, State> {
         <div className="tc pb3">
           Starting Angular Velocity
           <div className="flex items-center">
-          <div className="fl w-10 pa2">{omega}</div>
+          <div className="fl w-10 pa2 pl0">{omega}</div>
           <div className="fl w-90 pa2 pl3">
             <Slider
               min={-270}
               max={270}
+              marks={{
+                '-270': '-270',
+                '-180': '-180',
+                '-90': '-90',
+                '0': '0',
+                '90': '90',
+                '180': '180',
+                '270': '270'
+              }}
               value={omega}
               onChange={this.props.onOmegaChange.bind(this)}
             />
@@ -101,11 +117,16 @@ class Controls extends React.Component<Props, State> {
         <div className="tc pb3">
           Damping
           <div className="flex items-center">
-          <div className="fl w-10 pa2">{damping}</div>
+          <div className="fl w-10 pa2 pl0">{damping}</div>
           <div className="fl w-90 pa2 pl3">
             <Slider
               min={0}
               max={1}
+              marks={{
+                '0': '0',
+                '0.5': '0.5',
+                '1': '1'
+              }}
               step={0.01}
               value={damping}
               onChange={this.props.onDampingChange.bind(this)}
@@ -116,11 +137,18 @@ class Controls extends React.Component<Props, State> {
       <div className="tc pb3">
           Drive Amplitude
           <div className="flex items-center">
-          <div className="fl w-10 pa2">{driveAmplitude}</div>
+          <div className="fl w-10 pa2 pl0">{driveAmplitude}</div>
           <div className="fl w-90 pa2 pl3">
             <Slider
               min={0}
               max={2}
+              marks={{
+                '0': '0',
+                '0.5': '0.5',
+                '1': '1',
+                '1.5': '1.5',
+                '2': '2'
+              }}
               step={0.01}
               value={driveAmplitude}
               onChange={this.props.onDriveAmplitudeChange.bind(this)}
@@ -131,11 +159,17 @@ class Controls extends React.Component<Props, State> {
         <div className="tc pb3">
           Drive Frequency
           <div className="flex items-center">
-          <div className="fl w-10 pa2">{driveFrequency}</div>
+          <div className="fl w-10 pa2 pl0">{driveFrequency}</div>
           <div className="fl w-90 pa2 pl3">
             <Slider
               min={0}
               max={2}
+              marks={{
+                '0': '0',
+                '0.667': '0.667',
+                '1': '1',
+                '2': '2'
+              }}
               step={0.001}
               value={driveFrequency}
               onChange={this.props.onDriveFrequencyChange.bind(this)}
@@ -146,7 +180,7 @@ class Controls extends React.Component<Props, State> {
         <div className="tc pb3">
           Simulation Speed
           <div className="flex items-center">
-          <div className="fl w-10 pa2">{simulationSpeed}</div>
+          <div className="fl w-10 pa2 pl0">{simulationSpeed}</div>
           <div className="fl w-90 pa2 pl3">
             <Slider
               min={1}
