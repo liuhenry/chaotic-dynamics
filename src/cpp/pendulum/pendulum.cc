@@ -103,8 +103,7 @@ void Pendulum::tick(double speed, double damping, double amplitude,
     _integrator[0] = wrapped_theta;
     _integrator[2] = wrapped_phi;
 
-    const bool thetaZero = std::abs(poincare_theta) <= 1e-1;
-    if (i % 5 == 0 && !thetaZero) {
+    if (i % 5 == 0) {
       _phase_history.push_front({wrapped_theta, omega, wrapped_phi});
       if (_phase_history.size() > 10000) {
         _phase_history.pop_back();
