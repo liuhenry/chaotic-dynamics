@@ -9,14 +9,17 @@ export interface ParameterAction extends BaseAction {
 
 // State
 interface simulationState {
+  initialized: boolean;
   running: boolean;
 }
 
-interface parameterState {
+export interface ParameterState {
+  startTheta: number;
+  startOmega: number;
   damping: number;
 }
 
 export interface StoreState {
   simulation: simulationState;
-  parameters: parameterState;
+  parameters: ParameterState;
 }

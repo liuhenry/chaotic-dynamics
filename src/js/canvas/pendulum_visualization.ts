@@ -17,6 +17,7 @@ export default class PendulumVisualization extends Canvas {
   initialize() {
     this.clearAll();
     this.drawBoundaries();
+    this.drawPendulum();
   }
 
   start() {

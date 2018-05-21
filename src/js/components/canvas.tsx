@@ -1,8 +1,8 @@
 import * as React from 'react';
-import { connect } from 'react-redux';
+import { Dispatch, connect } from 'react-redux';
 
-import { StoreState } from '../types/index';
-import { runSimulation } from '../actions/simulation';
+import { StoreState, ParameterState } from '../types/index';
+import { initialized, runSimulation, stopSimulation } from '../actions/simulation';
 import store from '../stores/simulation';
 import PendulumVisualization from '../canvas/pendulum_visualization';
 
@@ -16,17 +16,15 @@ import PendulumVisualization from '../canvas/pendulum_visualization';
 
   onRuntimeInitialized(): void {
     this.initialized = true;
-    store.dispatch(runSimulation());
+    store.dispatch(initialized());
   }
 };
 
 interface Props {
-  width?: number;
-  height?: number;
+  initialized: false;
   running: boolean;
-  parameters: {
-    damping: number
-  };
+  parameters: ParameterState;
+  stop(): void;
 }
 
 interface State {
@@ -48,25 +46,50 @@ class Canvas extends React.Component<Props, State> {
   }
 
   componentDidUpdate(prevProps: Props) {
-    if (this.props.running) {
-      if (!this.state.model && this.state.canvas) {
-        const model = new (window as any).Module.Pendulum(179 * Math.PI / 180, 0);
+    if (this.props.initialized && this.state.canvas) {
+      if (!this.state.model ||
+          this.props.parameters.startTheta !== prevProps.parameters.startTheta ||
+          this.props.parameters.startOmega !== prevProps.parameters.startOmega
+        ) {
+
+        const model = new (window as any).Module.Pendulum(
+          this.props.parameters.startTheta * Math.PI / 180,
+          this.props.parameters.startOmega * Math.PI / 180
+        );
+
+        if (this.state.simulation) {
+          this.state.simulation.stop();
+          this.props.stop();
+        }
+
         const simulation = new PendulumVisualization(this.state.canvas, model);
-        simulation.initialize();
         simulation.setParameters(this.props.parameters.damping);
-        const animationID = simulation.start();
+        simulation.initialize();
         this.setState({
           model,
           simulation
         });
-      } else {
-        if (!!this.state.simulation) {
+        return;
+      }
+
+      if (this.state.simulation) {
+        if (this.props.running) {
+          if (!prevProps.running) {
+            this.state.simulation.start();
+          }
+
           if (JSON.stringify(this.props.parameters) !== JSON.stringify(prevProps.parameters)) {
             this.state.simulation.setParameters(this.props.parameters.damping);
           }
+        } else {
+          this.state.simulation.stop();
         }
       }
+
+
     }
+
+
   }
 
   render() {
@@ -76,9 +99,18 @@ class Canvas extends React.Component<Props, State> {
 
 function mapStateToProps(state: StoreState) {
   return {
+    initialized: state.simulation.initialized,
     running: state.simulation.running,
     parameters: state.parameters
   };
 }
 
-export default connect(mapStateToProps)(Canvas);
+function mapDispatchToProps(dispatch: Dispatch) {
+  return {
+    stop() {
+      dispatch(stopSimulation());
+    }
+  };
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Canvas);

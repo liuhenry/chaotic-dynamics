@@ -8,15 +8,26 @@ import {
 } from '../types/index';
 
 const initialSimulation = {
+  initialized: false,
   running: false
 };
 
 function simulation(state = initialSimulation, action: BaseAction) {
   switch(action.type) {
+    case Actions.INITIALIZED:
+      return {
+        ...state,
+        initialized: true
+      };
     case Actions.RUN_SIMULATION:
       return {
         ...state,
         running: true
+      };
+    case Actions.STOP_SIMULATION:
+      return {
+        ...state,
+        running: false
       };
     default:
       return state;
@@ -24,11 +35,23 @@ function simulation(state = initialSimulation, action: BaseAction) {
 }
 
 const initialParameters = {
+  startTheta: 90,
+  startOmega: 0,
   damping: 0
 };
 
 function parameters(state = initialParameters, action: ParameterAction) {
   switch (action.type) {
+    case Actions.CHANGE_START_THETA:
+      return {
+        ...state,
+        startTheta: action.value
+      };
+    case Actions.CHANGE_START_OMEGA:
+      return {
+        ...state,
+        startOmega: action.value
+      };
     case Actions.CHANGE_DAMPING:
       return {
         ...state,
