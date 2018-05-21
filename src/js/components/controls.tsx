@@ -11,7 +11,8 @@ import {
   changeDriveAmplitude,
   changeDriveFrequency,
   runSimulation,
-  stopSimulation
+  stopSimulation,
+  choosePreset
 } from '../actions/simulation';
 
 import 'rc-slider/assets/index.css';
@@ -33,10 +34,12 @@ interface Props {
   onDampingChange(value: number): void;
   onDriveAmplitudeChange(value: number): void;
   onDriveFrequencyChange(value: number): void;
+  onPresetChange(value: string): void;
 }
 
 interface State {
   simulationSpeedMode: number;
+  presetValue?: string;
 }
 
 class Controls extends React.Component<Props, State> {
@@ -52,6 +55,11 @@ class Controls extends React.Component<Props, State> {
       simulationSpeedMode: value
     });
     this.props.onSimulationSpeedChange(value);
+  }
+
+  onSelectPreset(event: Event) {
+    console.log(event.target.value);
+    this.props.onPresetChange(event.target.value);
   }
 
   render() {
@@ -156,6 +164,15 @@ class Controls extends React.Component<Props, State> {
             </div>
           </div>
         </div>
+        <div className="tc pt4 pb3">
+          Interesting Presets
+          <div className="w-70 center pv3">
+            <select className="w-100" onChange={this.onSelectPreset.bind(this)}>
+            <option value="nothing"></option>
+            <option value="chaos1">Chaos (0.5, 1.5, 0.667)</option>
+            </select>
+          </div>
+        </div>
         <div className="ph3 flex items-center">
           {!this.props.running ?
           <a className="center f6 link dim br-pill ba bw1 ph3 pv2 mb2 dib dark-blue"
@@ -218,6 +235,9 @@ function mapDispatchToProps(dispatch: Dispatch) {
     },
     onDriveFrequencyChange(value: number) {
       dispatch(changeDriveFrequency(Number(Math.round(Number(value + 'e4')) + 'e-4')));
+    },
+    onPresetChange(value: string) {
+      dispatch(choosePreset(value));
     }
   };
 }

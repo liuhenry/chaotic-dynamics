@@ -9,7 +9,8 @@ export const Actions = {
   CHANGE_START_OMEGA: 'CHANGE_START_OMEGA',
   CHANGE_DAMPING: 'CHANGE_DAMPING',
   CHANGE_DRIVE_AMPLITUDE: 'CHANGE_DRIVE_AMPLITUDE',
-  CHANGE_DRIVE_FREQUENCY: 'CHANGE_DRIVE_FREQUENCY'
+  CHANGE_DRIVE_FREQUENCY: 'CHANGE_DRIVE_FREQUENCY',
+  CHOOSE_PRESET: 'CHOOSE_PRESET'
 }
 
 export function initialized() {
@@ -68,6 +69,13 @@ export function changeDriveAmplitude(value: number): ParameterAction {
 export function changeDriveFrequency(value: number): ParameterAction {
   return {
     type: Actions.CHANGE_DRIVE_FREQUENCY,
+    value
+  };
+}
+
+export function choosePreset(value: string): {type: string, value: string} {
+  return {
+    type: Actions.CHOOSE_PRESET,
     value
   };
 }
