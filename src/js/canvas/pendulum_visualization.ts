@@ -49,8 +49,8 @@ export default class PendulumVisualization extends Canvas {
   }
 
   tick(): number | undefined {
-    this.clearLeft();
-
+    this.clearAll();
+    this.drawBoundaries();
     this.drawPendulum();
     this.drawPhaseHistory();
     this.drawPoincareSection();
@@ -97,7 +97,6 @@ export default class PendulumVisualization extends Canvas {
     const center = this.upperRight.center;
     const scale = (this.upperRight.width - 10) / (4*Math.PI);
     const { theta, omega } = this.simulation;
-    this.clearUpperRight();
 
     this.ctx.beginPath();
     var [lastT, lastO] = [theta, omega];
@@ -130,7 +129,6 @@ export default class PendulumVisualization extends Canvas {
     const center = this.lowerRight.center;
     const scale = (this.lowerRight.width - 10) / (2*Math.PI);
 
-    this.clearLowerRight();
     for (let i = 0; i < this.simulation.poincareSize; i++) {
       const [thisT, thisO] = [
         this.simulation.poincare_theta(i),

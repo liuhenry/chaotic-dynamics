@@ -61,6 +61,7 @@ export default class Canvas {
 
   drawBoundaries() {
     this.ctx.strokeStyle = 'grey';
+    this.ctx.fillStyle = 'grey';
     this.ctx.beginPath();
     this.ctx.moveTo(this.left.right, 0);
     this.ctx.lineTo(this.left.right, this.height);
@@ -70,6 +71,10 @@ export default class Canvas {
     this.ctx.moveTo(this.left.right, this.height/2);
     this.ctx.lineTo(this.width, this.height/2);
     this.ctx.stroke();
+
+    this.ctx.font = "20px sans-serif";
+    this.ctx.fillText("Phase Portrait", this.upperRight.left + 5, this.upperRight.top + 20);
+    this.ctx.fillText("Poincaré Map", this.lowerRight.left + 5, this.lowerRight.top + 20);
   }
 
   clearLeft() {
