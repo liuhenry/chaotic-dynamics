@@ -1,4 +1,5 @@
 import Canvas from './canvas';
+import { arcArrow } from './utils';
 
 
 export default class PendulumVisualization extends Canvas {
@@ -6,12 +7,16 @@ export default class PendulumVisualization extends Canvas {
   running: boolean;
   animationID?: number;
   damping: number;
+  driveAmplitude: number;
+  driveFrequency: number;
 
   constructor(canvas: HTMLCanvasElement, simulation: module.PendulumSimulation) {
     super(canvas);
     this.simulation = simulation;
     this.running = false;
     this.damping = 0;
+    this.driveAmplitude = 0;
+    this.driveFrequency = 0;
   }
 
   initialize() {
@@ -30,8 +35,10 @@ export default class PendulumVisualization extends Canvas {
     cancelAnimationFrame(this.animationID as number);
   }
 
-  setParameters(damping: number) {
+  setParameters(damping: number, driveAmplitude: number, driveFrequency: number) {
     this.damping = damping;
+    this.driveAmplitude = driveAmplitude;
+    this.driveFrequency = driveFrequency;
   }
 
   tick(): number | undefined {
@@ -40,7 +47,7 @@ export default class PendulumVisualization extends Canvas {
     this.drawPendulum();
     this.drawPhaseHistory();
 
-    this.simulation.tick(this.damping);
+    this.simulation.tick(this.damping, this.driveAmplitude, this.driveFrequency);
     if (this.running) {
       return requestAnimationFrame(() => { this.tick() });
     } else {
@@ -49,7 +56,7 @@ export default class PendulumVisualization extends Canvas {
   }
 
   drawPendulum() {
-    const { theta, omega } = this.simulation;
+    const { theta, omega, drive } = this.simulation;
     const x = Math.sin(theta);
     const y = Math.cos(theta);
     const center = this.left.center;
@@ -65,11 +72,17 @@ export default class PendulumVisualization extends Canvas {
 
     // Bob
     this.ctx.beginPath();
-    this.ctx.arc(center.x + x * scale, center.y + y * scale, scale/30, 0, 2 * Math.PI);
+    this.ctx.arc(center.x + x * scale, center.y + y * scale, scale/30, 0, 2*Math.PI);
     this.ctx.fillStyle = 'red';
-    this.ctx.fill();
     this.ctx.strokeStyle = 'black';
+    this.ctx.fill();
     this.ctx.stroke();
+
+    // Drive
+    const ccw = drive > 0 ? true : false;
+    this.ctx.strokeStyle = 'blue';
+    this.ctx.fillStyle = 'blue';
+    arcArrow(this.ctx, center.x, center.y, scale/2, 0.5*Math.PI, -drive*Math.PI + 0.5*Math.PI, ccw);
   }
 
   drawPhaseHistory() {
@@ -85,7 +98,7 @@ export default class PendulumVisualization extends Canvas {
         this.simulation.theta_idx(i),
         this.simulation.omega_idx(i)
       ];
-      const [x, y] = [thisT * scale + center.x, thisO * scale + center.y];
+      const [x, y] = [thisT * scale + center.x, -thisO * scale + center.y];
       if ((lastO > 0 && thisT - lastT > 0) || (lastO < 0 && thisT - lastT < 0) ) {
         // Dont connect wrapped points
         this.ctx.stroke();
@@ -96,7 +109,7 @@ export default class PendulumVisualization extends Canvas {
     }
     this.ctx.stroke();
 
-    const [x, y] = [theta * scale + center.x, omega * scale + center.y];
+    const [x, y] = [theta * scale + center.x, -omega * scale + center.y];
     this.drawPhasePoint(x, y, {current: true});
   }
 

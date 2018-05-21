@@ -17,6 +17,8 @@ export interface ParameterState {
   startTheta: number;
   startOmega: number;
   damping: number;
+  driveAmplitude: number;
+  driveFrequency: number;
 }
 
 export interface StoreState {

@@ -6,7 +6,9 @@ export const Actions = {
   STOP_SIMULATION: 'STOP_SIMULATION',
   CHANGE_START_THETA: 'CHANGE_START_THETA',
   CHANGE_START_OMEGA: 'CHANGE_START_OMEGA',
-  CHANGE_DAMPING: 'CHANGE_DAMPING'
+  CHANGE_DAMPING: 'CHANGE_DAMPING',
+  CHANGE_DRIVE_AMPLITUDE: 'CHANGE_DRIVE_AMPLITUDE',
+  CHANGE_DRIVE_FREQUENCY: 'CHANGE_DRIVE_FREQUENCY'
 }
 
 export function initialized() {
@@ -44,6 +46,20 @@ export function changeStartOmega(value: number): ParameterAction {
 export function changeDamping(value: number): ParameterAction {
   return {
     type: Actions.CHANGE_DAMPING,
+    value
+  };
+}
+
+export function changeDriveAmplitude(value: number): ParameterAction {
+  return {
+    type: Actions.CHANGE_DRIVE_AMPLITUDE,
+    value
+  };
+}
+
+export function changeDriveFrequency(value: number): ParameterAction {
+  return {
+    type: Actions.CHANGE_DRIVE_FREQUENCY,
     value
   };
 }

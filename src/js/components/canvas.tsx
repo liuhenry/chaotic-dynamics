@@ -63,7 +63,8 @@ class Canvas extends React.Component<Props, State> {
         }
 
         const simulation = new PendulumVisualization(this.state.canvas, model);
-        simulation.setParameters(this.props.parameters.damping);
+        const {damping, driveAmplitude, driveFrequency} = this.props.parameters;
+        simulation.setParameters(damping, driveAmplitude, driveFrequency);
         simulation.initialize();
         this.setState({
           model,
@@ -73,13 +74,14 @@ class Canvas extends React.Component<Props, State> {
       }
 
       if (this.state.simulation) {
+        if (JSON.stringify(this.props.parameters) !== JSON.stringify(prevProps.parameters)) {
+          const {damping, driveAmplitude, driveFrequency} = this.props.parameters;
+          this.state.simulation.setParameters(damping, driveAmplitude, driveFrequency);
+        }
+
         if (this.props.running) {
           if (!prevProps.running) {
             this.state.simulation.start();
-          }
-
-          if (JSON.stringify(this.props.parameters) !== JSON.stringify(prevProps.parameters)) {
-            this.state.simulation.setParameters(this.props.parameters.damping);
           }
         } else {
           this.state.simulation.stop();

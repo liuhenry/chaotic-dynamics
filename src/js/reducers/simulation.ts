@@ -35,9 +35,11 @@ function simulation(state = initialSimulation, action: BaseAction) {
 }
 
 const initialParameters = {
-  startTheta: 90,
+  startTheta: 0,
   startOmega: 0,
-  damping: 0
+  damping: 0,
+  driveAmplitude: 0,
+  driveFrequency: 0
 };
 
 function parameters(state = initialParameters, action: ParameterAction) {
@@ -56,6 +58,16 @@ function parameters(state = initialParameters, action: ParameterAction) {
       return {
         ...state,
         damping: action.value
+      };
+    case Actions.CHANGE_DRIVE_AMPLITUDE:
+      return {
+        ...state,
+        driveAmplitude: action.value
+      };
+    case Actions.CHANGE_DRIVE_FREQUENCY:
+      return {
+        ...state,
+        driveFrequency: action.value
       };
     default:
       return state;

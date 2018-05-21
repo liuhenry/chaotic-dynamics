@@ -7,6 +7,8 @@ import {
   changeStartTheta,
   changeStartOmega,
   changeDamping,
+  changeDriveAmplitude,
+  changeDriveFrequency,
   runSimulation,
   stopSimulation
 } from '../actions/simulation';
@@ -19,16 +21,20 @@ interface Props {
   theta: number;
   omega: number;
   damping: number;
+  driveAmplitude: number;
+  driveFrequency: number;
   run(): void;
   stop(): void;
   onThetaChange(value: number): void;
   onOmegaChange(value: number): void;
   onDampingChange(value: number): void;
+  onDriveAmplitudeChange(value: number): void;
+  onDriveFrequencyChange(value: number): void;
 }
 
 class Controls extends React.Component<Props> {
   render() {
-    const { theta, omega, damping } = this.props;
+    const { theta, omega, damping, driveAmplitude, driveFrequency } = this.props;
     return (
       <div>
         <div className="tc pb3">
@@ -69,21 +75,37 @@ class Controls extends React.Component<Props> {
               max={1}
               step={0.01}
               value={damping}
+              onChange={this.props.onDampingChange.bind(this)}
             />
           </div>
         </div>
       </div>
       <div className="tc pb3">
-          Drive Phase
+          Drive Amplitude
           <div className="flex items-center">
-          <div className="fl w-10 pa2">{damping}</div>
+          <div className="fl w-10 pa2">{driveAmplitude}</div>
           <div className="fl w-90 pa2 pl3">
             <Slider
               min={0}
-              max={1}
+              max={2}
               step={0.01}
-              value={damping}
-              onChange={this.props.onDampingChange.bind(this)}
+              value={driveAmplitude}
+              onChange={this.props.onDriveAmplitudeChange.bind(this)}
+            />
+            </div>
+          </div>
+        </div>
+        <div className="tc pb3">
+          Drive Frequency
+          <div className="flex items-center">
+          <div className="fl w-10 pa2">{driveFrequency}</div>
+          <div className="fl w-90 pa2 pl3">
+            <Slider
+              min={0}
+              max={2}
+              step={0.001}
+              value={driveFrequency}
+              onChange={this.props.onDriveFrequencyChange.bind(this)}
             />
             </div>
           </div>
@@ -109,7 +131,9 @@ function mapStateToProps(state: StoreState) {
     running: state.simulation.running,
     theta: state.parameters.startTheta,
     omega: state.parameters.startOmega,
-    damping: state.parameters.damping
+    damping: state.parameters.damping,
+    driveAmplitude: state.parameters.driveAmplitude,
+    driveFrequency: state.parameters.driveFrequency
   };
 }
 
@@ -129,6 +153,12 @@ function mapDispatchToProps(dispatch: Dispatch) {
     },
     onDampingChange(value: number) {
       dispatch(changeDamping(Number(Math.round(Number(value + 'e3')) + 'e-3')));
+    },
+    onDriveAmplitudeChange(value: number) {
+      dispatch(changeDriveAmplitude(Number(Math.round(Number(value + 'e3')) + 'e-3')));
+    },
+    onDriveFrequencyChange(value: number) {
+      dispatch(changeDriveFrequency(Number(Math.round(Number(value + 'e4')) + 'e-4')));
     }
   };
 }
