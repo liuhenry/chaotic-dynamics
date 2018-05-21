@@ -32336,6 +32336,15 @@ var Canvas = function () {
                 height: height
             };
         }
+    }, {
+        key: "outOfBounds",
+        value: function outOfBounds(x, y, area) {
+            if (x > area.right || x < area.left || y > area.bottom || y < area.top) {
+                return true;
+            } else {
+                return false;
+            }
+        }
     }]);
 
     return Canvas;
@@ -32426,12 +32435,17 @@ var PendulumVisualization = function (_canvas_1$default) {
             cancelAnimationFrame(this.animationID);
         }
     }, {
-        key: "setParameters",
-        value: function setParameters(speed, damping, driveAmplitude, driveFrequency) {
+        key: "setSpeed",
+        value: function setSpeed(speed) {
             this.speed = speed * 5;
+        }
+    }, {
+        key: "setParameters",
+        value: function setParameters(damping, driveAmplitude, driveFrequency) {
             this.damping = damping;
             this.driveAmplitude = driveAmplitude;
             this.driveFrequency = driveFrequency;
+            this.simulation.clear_poincare();
         }
     }, {
         key: "tick",
@@ -32441,6 +32455,7 @@ var PendulumVisualization = function (_canvas_1$default) {
             this.clearLeft();
             this.drawPendulum();
             this.drawPhaseHistory();
+            this.drawPoincareSection();
             this.simulation.tick(this.speed, this.damping, this.driveAmplitude, this.driveFrequency);
             if (this.running) {
                 return requestAnimationFrame(function () {
@@ -32509,23 +32524,66 @@ var PendulumVisualization = function (_canvas_1$default) {
                     this.ctx.stroke();
                     this.ctx.beginPath();
                 }
-                this.drawPhasePoint(_x, _y, { connect: true });
                 lastT = thisT;
                 lastO = thisO;
+
+                if (canvas_1.default.outOfBounds(_x, _y, this.upperRight)) {
+                    continue;
+                }
+                this.drawPhasePoint(_x, _y, { connect: true });
             }
             this.ctx.stroke();
             var x = theta * scale + center.x,
                 y = -omega * scale + center.y;
 
-            this.drawPhasePoint(x, y, { current: true });
+            if (!canvas_1.default.outOfBounds(x, y, this.upperRight)) {
+                this.drawPhasePoint(x, y, { current: true });
+            }
+        }
+    }, {
+        key: "drawPoincareSection",
+        value: function drawPoincareSection() {
+            var center = this.lowerRight.center;
+            var scale = (this.lowerRight.width - 10) / (2 * Math.PI);
+            this.clearLowerRight();
+            for (var i = 0; i < this.simulation.poincareSize; i++) {
+                var _ref2 = [this.simulation.poincare_theta(i), this.simulation.poincare_omega(i)],
+                    thisT = _ref2[0],
+                    thisO = _ref2[1];
+                var x = thisT * scale + center.x,
+                    y = -thisO * scale + center.y;
+
+                if (canvas_1.default.outOfBounds(x, y, this.lowerRight)) {
+                    continue;
+                }
+                this.ctx.beginPath();
+                this.ctx.arc(x, y, this.lowerRight.width / 500, 0, 2 * Math.PI);
+                this.ctx.fillStyle = 'black';
+                this.ctx.fill();
+            }
+            if (this.simulation.poincareSize) {
+                var _ref3 = [this.simulation.poincare_theta(0), this.simulation.poincare_omega(0)],
+                    theta = _ref3[0],
+                    omega = _ref3[1];
+
+                var _x2 = theta * scale + center.x,
+                    _y2 = -omega * scale + center.y;
+
+                if (!canvas_1.default.outOfBounds(_x2, _y2, this.lowerRight)) {
+                    this.ctx.beginPath();
+                    this.ctx.arc(_x2, _y2, this.lowerRight.width / 100, 0, 2 * Math.PI);
+                    this.ctx.fillStyle = 'red';
+                    this.ctx.fill();
+                }
+            }
         }
     }, {
         key: "drawPhasePoint",
-        value: function drawPhasePoint(x, y, _ref2) {
-            var _ref2$current = _ref2.current,
-                current = _ref2$current === undefined ? false : _ref2$current,
-                _ref2$connect = _ref2.connect,
-                connect = _ref2$connect === undefined ? false : _ref2$connect;
+        value: function drawPhasePoint(x, y, _ref4) {
+            var _ref4$current = _ref4.current,
+                current = _ref4$current === undefined ? false : _ref4$current,
+                _ref4$connect = _ref4.connect,
+                connect = _ref4$connect === undefined ? false : _ref4$connect;
 
             var scale = this.upperRight.width / 100;
             if (current) {
@@ -32708,6 +32766,14 @@ function _inherits(subClass, superClass) {
     }subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } });if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
 }
 
+var __rest = undefined && undefined.__rest || function (s, e) {
+    var t = {};
+    for (var p in s) {
+        if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0) t[p] = s[p];
+    }if (s != null && typeof Object.getOwnPropertySymbols === "function") for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
+        if (e.indexOf(p[i]) < 0) t[p[i]] = s[p[i]];
+    }return t;
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 var React = __webpack_require__(/*! react */ "./node_modules/react/index.js");
 var react_redux_1 = __webpack_require__(/*! react-redux */ "./node_modules/react-redux/es/index.js");
@@ -32756,12 +32822,12 @@ var Canvas = function (_React$Component) {
                     }
                     var simulation = new pendulum_visualization_1.default(this.state.canvas, model);
                     var _props$parameters = this.props.parameters,
-                        speed = _props$parameters.simulationSpeed,
                         damping = _props$parameters.damping,
                         driveAmplitude = _props$parameters.driveAmplitude,
                         driveFrequency = _props$parameters.driveFrequency;
 
-                    simulation.setParameters(speed, damping, driveAmplitude, driveFrequency);
+                    simulation.setSpeed(this.props.speed);
+                    simulation.setParameters(damping, driveAmplitude, driveFrequency);
                     simulation.initialize();
                     this.setState({
                         model: model,
@@ -32770,14 +32836,17 @@ var Canvas = function (_React$Component) {
                     return;
                 }
                 if (this.state.simulation) {
+                    if (this.props.speed !== prevProps.speed) {
+                        this.state.simulation.setSpeed(this.props.speed);
+                    }
                     if (JSON.stringify(this.props.parameters) !== JSON.stringify(prevProps.parameters)) {
                         var _props$parameters2 = this.props.parameters,
-                            _speed = _props$parameters2.simulationSpeed,
+                            speed = _props$parameters2.simulationSpeed,
                             _damping = _props$parameters2.damping,
                             _driveAmplitude = _props$parameters2.driveAmplitude,
                             _driveFrequency = _props$parameters2.driveFrequency;
 
-                        this.state.simulation.setParameters(_speed, _damping, _driveAmplitude, _driveFrequency);
+                        this.state.simulation.setParameters(_damping, _driveAmplitude, _driveFrequency);
                     }
                     if (this.props.running) {
                         if (!prevProps.running) {
@@ -32800,10 +32869,14 @@ var Canvas = function (_React$Component) {
 }(React.Component);
 
 function mapStateToProps(state) {
+    var _a = state.parameters,
+        speed = _a.simulationSpeed,
+        parameters = __rest(_a, ["simulationSpeed"]);
     return {
         initialized: state.simulation.initialized,
         running: state.simulation.running,
-        parameters: state.parameters
+        speed: speed,
+        parameters: parameters
     };
 }
 function mapDispatchToProps(dispatch) {
@@ -32937,7 +33010,7 @@ function mapDispatchToProps(dispatch) {
                 case 3:
                     return dispatch(simulation_1.changeSimulationSpeed(5));
                 case 4:
-                    return dispatch(simulation_1.changeSimulationSpeed(500));
+                    return dispatch(simulation_1.changeSimulationSpeed(1000));
             }
         },
         onThetaChange: function onThetaChange(value) {
