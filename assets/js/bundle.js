@@ -32172,7 +32172,8 @@ exports.Actions = {
     CHANGE_START_OMEGA: 'CHANGE_START_OMEGA',
     CHANGE_DAMPING: 'CHANGE_DAMPING',
     CHANGE_DRIVE_AMPLITUDE: 'CHANGE_DRIVE_AMPLITUDE',
-    CHANGE_DRIVE_FREQUENCY: 'CHANGE_DRIVE_FREQUENCY'
+    CHANGE_DRIVE_FREQUENCY: 'CHANGE_DRIVE_FREQUENCY',
+    CHOOSE_PRESET: 'CHOOSE_PRESET'
 };
 function initialized() {
     return {
@@ -32234,6 +32235,13 @@ function changeDriveFrequency(value) {
     };
 }
 exports.changeDriveFrequency = changeDriveFrequency;
+function choosePreset(value) {
+    return {
+        type: exports.Actions.CHOOSE_PRESET,
+        value: value
+    };
+}
+exports.choosePreset = choosePreset;
 
 /***/ }),
 
@@ -32960,6 +32968,12 @@ var Controls = function (_React$Component) {
             this.props.onSimulationSpeedChange(value);
         }
     }, {
+        key: "onSelectPreset",
+        value: function onSelectPreset(event) {
+            console.log(event.target.value);
+            this.props.onPresetChange(event.target.value);
+        }
+    }, {
         key: "render",
         value: function render() {
             var _props = this.props,
@@ -32975,7 +32989,7 @@ var Controls = function (_React$Component) {
                     2: 'Double',
                     3: 'Fast',
                     4: 'Plotter'
-                }, step: null, value: this.state.simulationSpeedMode, onChange: this.onSimulationSpeedChange.bind(this) })))), React.createElement("div", { className: "ph3 flex items-center" }, !this.props.running ? React.createElement("a", { className: "center f6 link dim br-pill ba bw1 ph3 pv2 mb2 dib dark-blue", onClick: this.props.run.bind(this) }, "Run Simulation") : React.createElement("a", { className: "center f6 link dim br-pill ba bw1 ph3 pv2 mb2 dib dark-blue", onClick: this.props.stop.bind(this) }, "Stop Simulation")));
+                }, step: null, value: this.state.simulationSpeedMode, onChange: this.onSimulationSpeedChange.bind(this) })))), React.createElement("div", { className: "tc pt4 pb3" }, "Interesting Presets", React.createElement("div", { className: "w-70 center pv3" }, React.createElement("select", { className: "w-100", onChange: this.onSelectPreset.bind(this) }, React.createElement("option", { value: "nothing" }), React.createElement("option", { value: "chaos1" }, "Chaos (0.5, 1.5, 0.667)")))), React.createElement("div", { className: "ph3 flex items-center" }, !this.props.running ? React.createElement("a", { className: "center f6 link dim br-pill ba bw1 ph3 pv2 mb2 dib dark-blue", onClick: this.props.run.bind(this) }, "Run Simulation") : React.createElement("a", { className: "center f6 link dim br-pill ba bw1 ph3 pv2 mb2 dib dark-blue", onClick: this.props.stop.bind(this) }, "Stop Simulation")));
         }
     }]);
 
@@ -33027,6 +33041,9 @@ function mapDispatchToProps(dispatch) {
         },
         onDriveFrequencyChange: function onDriveFrequencyChange(value) {
             dispatch(simulation_1.changeDriveFrequency(Number(Math.round(Number(value + 'e4')) + 'e-4')));
+        },
+        onPresetChange: function onPresetChange(value) {
+            dispatch(simulation_1.choosePreset(value));
         }
     };
 }
@@ -33094,6 +33111,18 @@ var initialParameters = {
     driveFrequency: 0,
     simulationSpeed: 1
 };
+function presets(preset) {
+    switch (preset) {
+        case 'chaos1':
+            return {
+                damping: 0.5,
+                driveAmplitude: 1.5,
+                driveFrequency: 0.667
+            };
+        default:
+            return undefined;
+    }
+}
 function parameters() {
     var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : initialParameters;
     var action = arguments[1];
@@ -33111,6 +33140,13 @@ function parameters() {
             return Object.assign({}, state, { driveAmplitude: action.value });
         case simulation_1.Actions.CHANGE_DRIVE_FREQUENCY:
             return Object.assign({}, state, { driveFrequency: action.value });
+        case simulation_1.Actions.CHOOSE_PRESET:
+            var preset = presets(action.value);
+            if (preset) {
+                return Object.assign({}, state, preset);
+            } else {
+                return state;
+            }
         default:
             return state;
     }
