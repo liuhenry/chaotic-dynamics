@@ -4,6 +4,7 @@ export const Actions = {
   INITIALIZED: 'INITIALIZED',
   RUN_SIMULATION: 'RUN_SIMULATION',
   STOP_SIMULATION: 'STOP_SIMULATION',
+  CHANGE_SIMULATION_SPEED: 'CHANGE_SIMULATION_SPEED',
   CHANGE_START_THETA: 'CHANGE_START_THETA',
   CHANGE_START_OMEGA: 'CHANGE_START_OMEGA',
   CHANGE_DAMPING: 'CHANGE_DAMPING',
@@ -26,6 +27,13 @@ export function runSimulation() {
 export function stopSimulation() {
   return {
     type: Actions.STOP_SIMULATION
+  };
+}
+
+export function changeSimulationSpeed(value: number): ParameterAction {
+  return {
+    type: Actions.CHANGE_SIMULATION_SPEED,
+    value
   };
 }
 

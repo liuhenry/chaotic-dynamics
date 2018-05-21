@@ -4,6 +4,7 @@ import Slider from 'rc-slider';
 
 import { StoreState } from '../types/index';
 import {
+  changeSimulationSpeed,
   changeStartTheta,
   changeStartOmega,
   changeDamping,
@@ -18,6 +19,7 @@ import 'rc-slider/assets/index.css';
 
 interface Props {
   running: boolean;
+  simulationSpeed: number;
   theta: number;
   omega: number;
   damping: number;
@@ -25,6 +27,7 @@ interface Props {
   driveFrequency: number;
   run(): void;
   stop(): void;
+  onSimulationSpeedChange(value: number): void;
   onThetaChange(value: number): void;
   onOmegaChange(value: number): void;
   onDampingChange(value: number): void;
@@ -32,9 +35,31 @@ interface Props {
   onDriveFrequencyChange(value: number): void;
 }
 
-class Controls extends React.Component<Props> {
+interface State {
+  simulationSpeedMode: number;
+}
+
+class Controls extends React.Component<Props, State> {
+  constructor(props: Props, context?: any) {
+    super(props, context);
+    this.state = {
+      simulationSpeedMode: 1
+    };
+  }
+
+  onSimulationSpeedChange(value: number) {
+    this.setState({
+      simulationSpeedMode: value
+    });
+    this.props.onSimulationSpeedChange(value);
+  }
+
   render() {
-    const { theta, omega, damping, driveAmplitude, driveFrequency } = this.props;
+    const {
+      simulationSpeed,
+      theta, omega,
+      damping, driveAmplitude, driveFrequency
+    } = this.props;
     return (
       <div>
         <div className="tc pb3">
@@ -110,6 +135,27 @@ class Controls extends React.Component<Props> {
             </div>
           </div>
         </div>
+        <div className="tc pb3">
+          Simulation Speed
+          <div className="flex items-center">
+          <div className="fl w-10 pa2">{simulationSpeed}</div>
+          <div className="fl w-90 pa2 pl3">
+            <Slider
+              min={1}
+              max={4}
+              marks={{
+                1: 'Normal',
+                2: 'Double',
+                3: 'Fast',
+                4: 'Plotter'
+              }}
+              step={null}
+              value={this.state.simulationSpeedMode}
+              onChange={this.onSimulationSpeedChange.bind(this)}
+            />
+            </div>
+          </div>
+        </div>
         <div className="ph3 flex items-center">
           {!this.props.running ?
           <a className="center f6 link dim br-pill ba bw1 ph3 pv2 mb2 dib dark-blue"
@@ -129,6 +175,7 @@ class Controls extends React.Component<Props> {
 function mapStateToProps(state: StoreState) {
   return {
     running: state.simulation.running,
+    simulationSpeed: state.parameters.simulationSpeed,
     theta: state.parameters.startTheta,
     omega: state.parameters.startOmega,
     damping: state.parameters.damping,
@@ -144,6 +191,18 @@ function mapDispatchToProps(dispatch: Dispatch) {
     },
     stop() {
       dispatch(stopSimulation());
+    },
+    onSimulationSpeedChange(value: number) {
+      switch(value) {
+        case 1:
+          return dispatch(changeSimulationSpeed(1));
+        case 2:
+          return dispatch(changeSimulationSpeed(2));
+        case 3:
+          return dispatch(changeSimulationSpeed(5));
+        case 4:
+          return dispatch(changeSimulationSpeed(500));
+      }
     },
     onThetaChange(value: number) {
       dispatch(changeStartTheta(value));

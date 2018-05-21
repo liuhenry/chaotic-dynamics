@@ -6,6 +6,7 @@ export default class PendulumVisualization extends Canvas {
   simulation: module.PendulumSimulation;
   running: boolean;
   animationID?: number;
+  speed: number;
   damping: number;
   driveAmplitude: number;
   driveFrequency: number;
@@ -14,6 +15,7 @@ export default class PendulumVisualization extends Canvas {
     super(canvas);
     this.simulation = simulation;
     this.running = false;
+    this.speed = 1;
     this.damping = 0;
     this.driveAmplitude = 0;
     this.driveFrequency = 0;
@@ -35,7 +37,8 @@ export default class PendulumVisualization extends Canvas {
     cancelAnimationFrame(this.animationID as number);
   }
 
-  setParameters(damping: number, driveAmplitude: number, driveFrequency: number) {
+  setParameters(speed: number, damping: number, driveAmplitude: number, driveFrequency: number) {
+    this.speed = speed * 5;
     this.damping = damping;
     this.driveAmplitude = driveAmplitude;
     this.driveFrequency = driveFrequency;
@@ -47,7 +50,7 @@ export default class PendulumVisualization extends Canvas {
     this.drawPendulum();
     this.drawPhaseHistory();
 
-    this.simulation.tick(this.damping, this.driveAmplitude, this.driveFrequency);
+    this.simulation.tick(this.speed, this.damping, this.driveAmplitude, this.driveFrequency);
     if (this.running) {
       return requestAnimationFrame(() => { this.tick() });
     } else {

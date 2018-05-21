@@ -23,7 +23,7 @@ export function arcArrow(
       x1 = ex-scale*Math.cos(tangentAngle+0.5);
       y1 = ey-scale*Math.sin(tangentAngle+0.5);
       x2 = ex-scale*Math.cos(tangentAngle-0.5);
-      y2 = ey-scale*Math.sin(tangentAngle-0.5;
+      y2 = ey-scale*Math.sin(tangentAngle-0.5);
     } else {
       x1 = ex+scale*Math.cos(tangentAngle+0.5);
       y1 = ey+scale*Math.sin(tangentAngle+0.5);

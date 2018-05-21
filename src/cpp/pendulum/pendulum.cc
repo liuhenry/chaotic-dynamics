@@ -19,7 +19,8 @@ class Pendulum {
   int _t;
   double _drive;
   Integrator _integrator;
-  deque<tuple<double, double>> _phase_history;
+  deque<tuple<double, double, double>> _phase_history;
+  deque<tuple<double, double>> _phase_slice;
 
   static vector<double> eom(double, const vector<double> &,
                             const vector<double> &);
@@ -29,7 +30,8 @@ class Pendulum {
       : _t(0),
         _drive(0),
         _integrator(Pendulum::eom, {theta, omega, 0}),
-        _phase_history() {}
+        _phase_history(),
+        _phase_slice() {}
 
   double theta() const { return _integrator[0]; }
   double omega() const { return _integrator[1]; }
@@ -39,7 +41,7 @@ class Pendulum {
   double theta(int idx) const { return get<0>(_phase_history[idx]); }
   double omega(int idx) const { return get<1>(_phase_history[idx]); }
 
-  void tick(double, double, double);
+  void tick(double, double, double, double);
 };
 
 vector<double> Pendulum::eom(double t, const vector<double> &params,
@@ -58,26 +60,28 @@ vector<double> Pendulum::eom(double t, const vector<double> &params,
   return vector<double>{dtheta, domega, dphi};
 }
 
-void Pendulum::tick(double damping, double amplitude, double frequency) {
-  for (int i = 0; i < 5; i++) {
+void Pendulum::tick(double speed, double damping, double amplitude, double frequency) {
+  for (int i = 0; i < speed; i++) {
     _integrator.step(_t, 0.01, {damping, amplitude, frequency});
-  }
 
-  double theta = _integrator[0];
-  double omega = _integrator[1];
-  double phi = _integrator[2];
+    double theta = _integrator[0];
+    double omega = _integrator[1];
+    double phi = _integrator[2];
 
-  _drive = amplitude * cos(phi);
+    _drive = amplitude * cos(phi);
 
-  // https://stackoverflow.com/questions/4633177/c-how-to-wrap-a-float-to-the-interval-pi-pi
-  theta =
-      -M_PI * 2 + fmod(M_PI * 4 + fmod(theta + M_PI * 2, M_PI * 4), M_PI * 4);
+    // https://stackoverflow.com/questions/4633177/c-how-to-wrap-a-float-to-the-interval-pi-pi
+    theta =
+        -M_PI * 2 + fmod(M_PI * 4 + fmod(theta + M_PI * 2, M_PI * 4), M_PI * 4);
 
-  _integrator[0] = theta;
+    _integrator[0] = theta;
 
-  _phase_history.push_front({theta, omega});
-  if (_phase_history.size() > 5000) {
-    _phase_history.pop_back();
+    if (i%5 == 0) {
+      _phase_history.push_front({theta, omega, phi});
+      if (_phase_history.size() > 50000) {
+        _phase_history.pop_back();
+      }
+    }
   }
 }
 

@@ -14,6 +14,7 @@ interface simulationState {
 }
 
 export interface ParameterState {
+  simulationSpeed: number;
   startTheta: number;
   startOmega: number;
   damping: number;
