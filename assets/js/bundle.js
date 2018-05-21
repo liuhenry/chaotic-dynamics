@@ -32169,7 +32169,9 @@ exports.Actions = {
     STOP_SIMULATION: 'STOP_SIMULATION',
     CHANGE_START_THETA: 'CHANGE_START_THETA',
     CHANGE_START_OMEGA: 'CHANGE_START_OMEGA',
-    CHANGE_DAMPING: 'CHANGE_DAMPING'
+    CHANGE_DAMPING: 'CHANGE_DAMPING',
+    CHANGE_DRIVE_AMPLITUDE: 'CHANGE_DRIVE_AMPLITUDE',
+    CHANGE_DRIVE_FREQUENCY: 'CHANGE_DRIVE_FREQUENCY'
 };
 function initialized() {
     return {
@@ -32210,6 +32212,20 @@ function changeDamping(value) {
     };
 }
 exports.changeDamping = changeDamping;
+function changeDriveAmplitude(value) {
+    return {
+        type: exports.Actions.CHANGE_DRIVE_AMPLITUDE,
+        value: value
+    };
+}
+exports.changeDriveAmplitude = changeDriveAmplitude;
+function changeDriveFrequency(value) {
+    return {
+        type: exports.Actions.CHANGE_DRIVE_FREQUENCY,
+        value: value
+    };
+}
+exports.changeDriveFrequency = changeDriveFrequency;
 
 /***/ }),
 
@@ -32363,6 +32379,7 @@ function _inherits(subClass, superClass) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
 var canvas_1 = __webpack_require__(/*! ./canvas */ "./src/js/canvas/canvas.ts");
+var utils_1 = __webpack_require__(/*! ./utils */ "./src/js/canvas/utils.ts");
 
 var PendulumVisualization = function (_canvas_1$default) {
     _inherits(PendulumVisualization, _canvas_1$default);
@@ -32375,6 +32392,8 @@ var PendulumVisualization = function (_canvas_1$default) {
         _this.simulation = simulation;
         _this.running = false;
         _this.damping = 0;
+        _this.driveAmplitude = 0;
+        _this.driveFrequency = 0;
         return _this;
     }
 
@@ -32399,8 +32418,10 @@ var PendulumVisualization = function (_canvas_1$default) {
         }
     }, {
         key: "setParameters",
-        value: function setParameters(damping) {
+        value: function setParameters(damping, driveAmplitude, driveFrequency) {
             this.damping = damping;
+            this.driveAmplitude = driveAmplitude;
+            this.driveFrequency = driveFrequency;
         }
     }, {
         key: "tick",
@@ -32410,7 +32431,7 @@ var PendulumVisualization = function (_canvas_1$default) {
             this.clearLeft();
             this.drawPendulum();
             this.drawPhaseHistory();
-            this.simulation.tick(this.damping);
+            this.simulation.tick(this.damping, this.driveAmplitude, this.driveFrequency);
             if (this.running) {
                 return requestAnimationFrame(function () {
                     _this2.tick();
@@ -32424,7 +32445,8 @@ var PendulumVisualization = function (_canvas_1$default) {
         value: function drawPendulum() {
             var _simulation = this.simulation,
                 theta = _simulation.theta,
-                omega = _simulation.omega;
+                omega = _simulation.omega,
+                drive = _simulation.drive;
 
             var x = Math.sin(theta);
             var y = Math.cos(theta);
@@ -32441,9 +32463,14 @@ var PendulumVisualization = function (_canvas_1$default) {
             this.ctx.beginPath();
             this.ctx.arc(center.x + x * scale, center.y + y * scale, scale / 30, 0, 2 * Math.PI);
             this.ctx.fillStyle = 'red';
-            this.ctx.fill();
             this.ctx.strokeStyle = 'black';
+            this.ctx.fill();
             this.ctx.stroke();
+            // Drive
+            var ccw = drive > 0 ? true : false;
+            this.ctx.strokeStyle = 'blue';
+            this.ctx.fillStyle = 'blue';
+            utils_1.arcArrow(this.ctx, center.x, center.y, scale / 2, 0.5 * Math.PI, -drive * Math.PI + 0.5 * Math.PI, ccw);
         }
     }, {
         key: "drawPhaseHistory",
@@ -32465,7 +32492,7 @@ var PendulumVisualization = function (_canvas_1$default) {
                     thisO = _ref[1];
 
                 var _x = thisT * scale + center.x,
-                    _y = thisO * scale + center.y;
+                    _y = -thisO * scale + center.y;
 
                 if (lastO > 0 && thisT - lastT > 0 || lastO < 0 && thisT - lastT < 0) {
                     // Dont connect wrapped points
@@ -32478,7 +32505,7 @@ var PendulumVisualization = function (_canvas_1$default) {
             }
             this.ctx.stroke();
             var x = theta * scale + center.x,
-                y = omega * scale + center.y;
+                y = -omega * scale + center.y;
 
             this.drawPhasePoint(x, y, { current: true });
         }
@@ -32516,6 +32543,50 @@ var PendulumVisualization = function (_canvas_1$default) {
 }(canvas_1.default);
 
 exports.default = PendulumVisualization;
+
+/***/ }),
+
+/***/ "./src/js/canvas/utils.ts":
+/*!********************************!*\
+  !*** ./src/js/canvas/utils.ts ***!
+  \********************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", { value: true });
+function arcArrow(ctx, x, y, radius, startAngle, endAngle, anticlockwise) {
+    ctx.beginPath();
+    ctx.arc(x, y, radius, startAngle, endAngle, anticlockwise);
+    ctx.stroke();
+    if (startAngle !== endAngle) {
+        var scale = radius / 10;
+        var ex = Math.cos(endAngle) * radius + x;
+        var ey = Math.sin(endAngle) * radius + y;
+        var tangentAngle = Math.atan2(x - ex, ey - y);
+        var x1, y1, x2, y2;
+        if (anticlockwise) {
+            x1 = ex - scale * Math.cos(tangentAngle + 0.5);
+            y1 = ey - scale * Math.sin(tangentAngle + 0.5);
+            x2 = ex - scale * Math.cos(tangentAngle - 0.5);
+            y2 = ey - scale * Math.sin(tangentAngle - 0.5);
+        } else {
+            x1 = ex + scale * Math.cos(tangentAngle + 0.5);
+            y1 = ey + scale * Math.sin(tangentAngle + 0.5);
+            x2 = ex + scale * Math.cos(tangentAngle - 0.5);
+            y2 = ey + scale * Math.sin(tangentAngle - 0.5);
+        }
+        ctx.beginPath();
+        ctx.moveTo(ex, ey);
+        ctx.lineTo(x1, y1);
+        ctx.lineTo(x2, y2);
+        ctx.lineTo(ex, ey);
+        ctx.fill();
+    }
+}
+exports.arcArrow = arcArrow;
 
 /***/ }),
 
@@ -32674,7 +32745,12 @@ var Canvas = function (_React$Component) {
                         this.props.stop();
                     }
                     var simulation = new pendulum_visualization_1.default(this.state.canvas, model);
-                    simulation.setParameters(this.props.parameters.damping);
+                    var _props$parameters = this.props.parameters,
+                        damping = _props$parameters.damping,
+                        driveAmplitude = _props$parameters.driveAmplitude,
+                        driveFrequency = _props$parameters.driveFrequency;
+
+                    simulation.setParameters(damping, driveAmplitude, driveFrequency);
                     simulation.initialize();
                     this.setState({
                         model: model,
@@ -32683,12 +32759,17 @@ var Canvas = function (_React$Component) {
                     return;
                 }
                 if (this.state.simulation) {
+                    if (JSON.stringify(this.props.parameters) !== JSON.stringify(prevProps.parameters)) {
+                        var _props$parameters2 = this.props.parameters,
+                            _damping = _props$parameters2.damping,
+                            _driveAmplitude = _props$parameters2.driveAmplitude,
+                            _driveFrequency = _props$parameters2.driveFrequency;
+
+                        this.state.simulation.setParameters(_damping, _driveAmplitude, _driveFrequency);
+                    }
                     if (this.props.running) {
                         if (!prevProps.running) {
                             this.state.simulation.start();
-                        }
-                        if (JSON.stringify(this.props.parameters) !== JSON.stringify(prevProps.parameters)) {
-                            this.state.simulation.setParameters(this.props.parameters.damping);
                         }
                     } else {
                         this.state.simulation.stop();
@@ -32786,9 +32867,11 @@ var Controls = function (_React$Component) {
             var _props = this.props,
                 theta = _props.theta,
                 omega = _props.omega,
-                damping = _props.damping;
+                damping = _props.damping,
+                driveAmplitude = _props.driveAmplitude,
+                driveFrequency = _props.driveFrequency;
 
-            return React.createElement("div", null, React.createElement("div", { className: "tc pb3" }, "Starting Angle", React.createElement("div", { className: "flex items-center" }, React.createElement("div", { className: "fl w-10 pa2" }, theta), React.createElement("div", { className: "fl w-90 pa2 pl3" }, React.createElement(rc_slider_1.default, { min: -180, max: 180, value: theta, onChange: this.props.onThetaChange.bind(this) })))), React.createElement("div", { className: "tc pb3" }, "Starting Angular Velocity", React.createElement("div", { className: "flex items-center" }, React.createElement("div", { className: "fl w-10 pa2" }, omega), React.createElement("div", { className: "fl w-90 pa2 pl3" }, React.createElement(rc_slider_1.default, { min: -270, max: 270, value: omega, onChange: this.props.onOmegaChange.bind(this) })))), React.createElement("div", { className: "tc pb3" }, "Damping", React.createElement("div", { className: "flex items-center" }, React.createElement("div", { className: "fl w-10 pa2" }, damping), React.createElement("div", { className: "fl w-90 pa2 pl3" }, React.createElement(rc_slider_1.default, { min: 0, max: 1, step: 0.01, value: damping })))), React.createElement("div", { className: "tc pb3" }, "Drive Phase", React.createElement("div", { className: "flex items-center" }, React.createElement("div", { className: "fl w-10 pa2" }, damping), React.createElement("div", { className: "fl w-90 pa2 pl3" }, React.createElement(rc_slider_1.default, { min: 0, max: 1, step: 0.01, value: damping, onChange: this.props.onDampingChange.bind(this) })))), React.createElement("div", { className: "ph3 flex items-center" }, !this.props.running ? React.createElement("a", { className: "center f6 link dim br-pill ba bw1 ph3 pv2 mb2 dib dark-blue", onClick: this.props.run.bind(this) }, "Run Simulation") : React.createElement("a", { className: "center f6 link dim br-pill ba bw1 ph3 pv2 mb2 dib dark-blue", onClick: this.props.stop.bind(this) }, "Stop Simulation")));
+            return React.createElement("div", null, React.createElement("div", { className: "tc pb3" }, "Starting Angle", React.createElement("div", { className: "flex items-center" }, React.createElement("div", { className: "fl w-10 pa2" }, theta), React.createElement("div", { className: "fl w-90 pa2 pl3" }, React.createElement(rc_slider_1.default, { min: -180, max: 180, value: theta, onChange: this.props.onThetaChange.bind(this) })))), React.createElement("div", { className: "tc pb3" }, "Starting Angular Velocity", React.createElement("div", { className: "flex items-center" }, React.createElement("div", { className: "fl w-10 pa2" }, omega), React.createElement("div", { className: "fl w-90 pa2 pl3" }, React.createElement(rc_slider_1.default, { min: -270, max: 270, value: omega, onChange: this.props.onOmegaChange.bind(this) })))), React.createElement("div", { className: "tc pb3" }, "Damping", React.createElement("div", { className: "flex items-center" }, React.createElement("div", { className: "fl w-10 pa2" }, damping), React.createElement("div", { className: "fl w-90 pa2 pl3" }, React.createElement(rc_slider_1.default, { min: 0, max: 1, step: 0.01, value: damping, onChange: this.props.onDampingChange.bind(this) })))), React.createElement("div", { className: "tc pb3" }, "Drive Amplitude", React.createElement("div", { className: "flex items-center" }, React.createElement("div", { className: "fl w-10 pa2" }, driveAmplitude), React.createElement("div", { className: "fl w-90 pa2 pl3" }, React.createElement(rc_slider_1.default, { min: 0, max: 2, step: 0.01, value: driveAmplitude, onChange: this.props.onDriveAmplitudeChange.bind(this) })))), React.createElement("div", { className: "tc pb3" }, "Drive Frequency", React.createElement("div", { className: "flex items-center" }, React.createElement("div", { className: "fl w-10 pa2" }, driveFrequency), React.createElement("div", { className: "fl w-90 pa2 pl3" }, React.createElement(rc_slider_1.default, { min: 0, max: 2, step: 0.001, value: driveFrequency, onChange: this.props.onDriveFrequencyChange.bind(this) })))), React.createElement("div", { className: "ph3 flex items-center" }, !this.props.running ? React.createElement("a", { className: "center f6 link dim br-pill ba bw1 ph3 pv2 mb2 dib dark-blue", onClick: this.props.run.bind(this) }, "Run Simulation") : React.createElement("a", { className: "center f6 link dim br-pill ba bw1 ph3 pv2 mb2 dib dark-blue", onClick: this.props.stop.bind(this) }, "Stop Simulation")));
         }
     }]);
 
@@ -32800,7 +32883,9 @@ function mapStateToProps(state) {
         running: state.simulation.running,
         theta: state.parameters.startTheta,
         omega: state.parameters.startOmega,
-        damping: state.parameters.damping
+        damping: state.parameters.damping,
+        driveAmplitude: state.parameters.driveAmplitude,
+        driveFrequency: state.parameters.driveFrequency
     };
 }
 function mapDispatchToProps(dispatch) {
@@ -32819,6 +32904,12 @@ function mapDispatchToProps(dispatch) {
         },
         onDampingChange: function onDampingChange(value) {
             dispatch(simulation_1.changeDamping(Number(Math.round(Number(value + 'e3')) + 'e-3')));
+        },
+        onDriveAmplitudeChange: function onDriveAmplitudeChange(value) {
+            dispatch(simulation_1.changeDriveAmplitude(Number(Math.round(Number(value + 'e3')) + 'e-3')));
+        },
+        onDriveFrequencyChange: function onDriveFrequencyChange(value) {
+            dispatch(simulation_1.changeDriveFrequency(Number(Math.round(Number(value + 'e4')) + 'e-4')));
         }
     };
 }
@@ -32879,9 +32970,11 @@ function simulation() {
     }
 }
 var initialParameters = {
-    startTheta: 90,
+    startTheta: 0,
     startOmega: 0,
-    damping: 0
+    damping: 0,
+    driveAmplitude: 0,
+    driveFrequency: 0
 };
 function parameters() {
     var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : initialParameters;
@@ -32894,6 +32987,10 @@ function parameters() {
             return Object.assign({}, state, { startOmega: action.value });
         case simulation_1.Actions.CHANGE_DAMPING:
             return Object.assign({}, state, { damping: action.value });
+        case simulation_1.Actions.CHANGE_DRIVE_AMPLITUDE:
+            return Object.assign({}, state, { driveAmplitude: action.value });
+        case simulation_1.Actions.CHANGE_DRIVE_FREQUENCY:
+            return Object.assign({}, state, { driveFrequency: action.value });
         default:
             return state;
     }
