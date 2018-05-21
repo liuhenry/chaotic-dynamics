@@ -70,7 +70,7 @@ class Canvas extends React.Component<Props, State> {
   }
 
   render() {
-    return <canvas id="canvas" width="800px" height="500px"></canvas>;
+    return <canvas id="canvas" width="1600px" height="1000px" className="fl w-100 ba"></canvas>;
   }
 }
 

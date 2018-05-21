@@ -62,7 +62,7 @@ void Pendulum::tick(double damping=0) {
   _integrator[0] = theta;
 
   _phase_history.push_front({theta, omega});
-  if (_phase_history.size() > 500) {
+  if (_phase_history.size() > 5000) {
     _phase_history.pop_back();
   }
 }

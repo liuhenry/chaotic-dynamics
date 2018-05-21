@@ -22,16 +22,67 @@ class Controls extends React.Component<Props> {
     const { damping } = this.props;
     return (
       <div>
-        <Slider
-          min={0}
-          max={1}
-          step={0.01}
-          value={damping}
-          marks={{0: 'No Damping'}}
-          onChange={this.handleChange.bind(this)}
-        />
-        {damping}
+        <div className="tc pb3">
+          Starting Angle
+          <div className="flex items-center">
+          <div className="fl w-10 pa2">{damping}</div>
+          <div className="fl w-90 pa2">
+            <Slider
+              min={0}
+              max={1}
+              step={0.01}
+              value={damping}
+              onChange={this.handleChange.bind(this)}
+            />
+            </div>
+          </div>
+        </div>
+        <div className="tc pb3">
+          Starting Angular Velocity
+          <div className="flex items-center">
+          <div className="fl w-10 pa2">{damping}</div>
+          <div className="fl w-90 pa2">
+            <Slider
+              min={0}
+              max={1}
+              step={0.01}
+              value={damping}
+              onChange={this.handleChange.bind(this)}
+            />
+            </div>
+          </div>
+        </div>
+        <div className="tc pb3">
+          Damping
+          <div className="flex items-center">
+          <div className="fl w-10 pa2">{damping}</div>
+          <div className="fl w-90 pa2">
+            <Slider
+              min={0}
+              max={1}
+              step={0.01}
+              value={damping}
+              onChange={this.handleChange.bind(this)}
+            />
+          </div>
+        </div>
       </div>
+      <div className="tc pb3">
+          Drive Phase
+          <div className="flex items-center">
+          <div className="fl w-10 pa2">{damping}</div>
+          <div className="fl w-90 pa2">
+            <Slider
+              min={0}
+              max={1}
+              step={0.01}
+              value={damping}
+              onChange={this.handleChange.bind(this)}
+            />
+            </div>
+          </div>
+        </div>
+    </div>
     );
   }
 }

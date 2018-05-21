@@ -51,17 +51,20 @@ export default class PendulumVisualization extends Canvas {
     const { theta, omega } = this.simulation;
     const x = Math.sin(theta);
     const y = Math.cos(theta);
+    const center = this.left.center;
+    const scale = 300;
 
     // Line
     this.ctx.beginPath();
-    this.ctx.moveTo(250, 200);
-    this.ctx.lineTo(250 + x * 150, 200 + y * 150);
+    this.ctx.moveTo(center.x, center.y);
+    this.ctx.lineTo(center.x + x * scale, center.y + y * scale);
     this.ctx.strokeStyle = 'black';
+    this.ctx.lineWidth = 2;
     this.ctx.stroke();
 
     // Bob
     this.ctx.beginPath();
-    this.ctx.arc(250 + x * 150, 200 + y * 150, 5, 0, 2 * Math.PI);
+    this.ctx.arc(center.x + x * scale, center.y + y * scale, scale/30, 0, 2 * Math.PI);
     this.ctx.fillStyle = 'red';
     this.ctx.fill();
     this.ctx.strokeStyle = 'black';
@@ -69,8 +72,9 @@ export default class PendulumVisualization extends Canvas {
   }
 
   drawPhaseHistory() {
+    const center = this.upperRight.center;
+    const scale = (this.upperRight.width - 10) / (4*Math.PI);
     const { theta, omega } = this.simulation;
-    const scale = 290 / (4*Math.PI);
     this.clearUpperRight();
 
     this.ctx.beginPath();
@@ -80,7 +84,7 @@ export default class PendulumVisualization extends Canvas {
         this.simulation.theta_idx(i),
         this.simulation.omega_idx(i)
       ];
-      const [x, y] = [thisT * scale + 650, thisO * scale + 125];
+      const [x, y] = [thisT * scale + center.x, thisO * scale + center.y];
       if ((lastO > 0 && thisT - lastT > 0) || (lastO < 0 && thisT - lastT < 0) ) {
         // Dont connect wrapped points
         this.ctx.stroke();
@@ -91,19 +95,20 @@ export default class PendulumVisualization extends Canvas {
     }
     this.ctx.stroke();
 
-    const [x, y] = [theta * scale + 650, omega * scale + 125];
+    const [x, y] = [theta * scale + center.x, omega * scale + center.y];
     this.drawPhasePoint(x, y, {current: true});
   }
 
   drawPhasePoint(x: number, y: number, {current = false, connect = false}) {
+    const scale = this.upperRight.width / 100;
     if (current) {
       this.ctx.strokeStyle = 'red';
       this.ctx.fillStyle = 'red';
-      var size = 2;
+      var size = scale;
     } else {
       this.ctx.strokeStyle = 'black';
       this.ctx.fillStyle = 'black';
-      var size = 0.1;
+      var size = scale/10;
     }
     if (current) {
       this.ctx.beginPath();
@@ -111,6 +116,7 @@ export default class PendulumVisualization extends Canvas {
       this.ctx.fill();
       this.ctx.stroke();
     } else {
+      this.ctx.lineWidth = 1;
       this.ctx.lineTo(x, y);
     }
 
