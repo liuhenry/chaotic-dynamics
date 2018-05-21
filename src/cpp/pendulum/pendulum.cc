@@ -15,12 +15,7 @@ using std::vector;
 using emscripten::select_overload;
 #endif
 
-
 // Some utils (TODO: move into own class)
-bool isEqual(double x, double y, double epsilon) {
-  return std::abs(x - y) <= epsilon * std::abs(x);
-}
-
 double wrapMax(double x, double max) {
   /* wrap x -> [0,max) */
   return fmod(max + fmod(x, max), max);
@@ -30,7 +25,6 @@ double wrapMinMax(double x, double min, double max) {
   /* wrap x -> [min,max) */
   return min + wrapMax(x - min, max - min);
 }
-
 
 class Pendulum {
   int _t;
@@ -78,9 +72,9 @@ vector<double> Pendulum::eom(double t, const vector<double> &params,
   const double &damping = params[0], &amplitude = params[1],
                &frequency = params[2];
 
-  double dtheta = omega;
-  double domega = -sin(theta) - damping * omega + amplitude * cos(phi);
-  double dphi = frequency;
+  const double dtheta = omega;
+  const double domega = -sin(theta) - damping * omega + amplitude * cos(phi);
+  const double dphi = frequency;
   return vector<double>{dtheta, domega, dphi};
 }
 
@@ -90,9 +84,9 @@ void Pendulum::tick(double speed, double damping, double amplitude,
     // Step size constant at 0.01, seems to work well for our purposes
     _integrator.step(_t, 0.01, {damping, amplitude, frequency});
 
-    double theta = _integrator[0];
-    double omega = _integrator[1];
-    double phi = _integrator[2];
+    const double theta = _integrator[0];
+    const double omega = _integrator[1];
+    const double phi = _integrator[2];
 
     // For visualization of drive state
     _drive = amplitude * cos(phi);
@@ -102,21 +96,22 @@ void Pendulum::tick(double speed, double damping, double amplitude,
     // wrapped_theta: [-2π, 2π) - extended range to allow basin visualization
     // wrapped_phi: [0, 2π)
     // poincare_theta: [-π, π)
-    double wrapped_theta = wrapMinMax(theta, -M_PI*2, M_PI*2);
-    double wrapped_phi = wrapMax(phi, M_PI*2);
-    double poincare_theta = wrapMinMax(theta, -M_PI, M_PI);
+    const double wrapped_theta = wrapMinMax(theta, -M_PI * 2, M_PI * 2);
+    const double wrapped_phi = wrapMax(phi, M_PI * 2);
+    const double poincare_theta = wrapMinMax(theta, -M_PI, M_PI);
 
     _integrator[0] = wrapped_theta;
     _integrator[2] = wrapped_phi;
 
-    if (i%5 == 0) {
+    const bool thetaZero = std::abs(poincare_theta) <= 1e-1;
+    if (i % 5 == 0 && !thetaZero) {
       _phase_history.push_front({wrapped_theta, omega, wrapped_phi});
       if (_phase_history.size() > 10000) {
         _phase_history.pop_back();
       }
     }
 
-    const bool phiZero = isEqual(wrapped_phi, 0, epsilon);
+    const bool phiZero = std::abs(wrapped_phi) <= 1e-3;
     if (phiZero || get<2>(_phase_history.front()) > wrapped_phi) {
       _phase_slice.push_front({poincare_theta, omega});
       if (_phase_slice.size() > 10000) {
