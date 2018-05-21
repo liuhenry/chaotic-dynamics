@@ -60,8 +60,10 @@ export default class Canvas {
   }
 
   drawBoundaries() {
-    this.ctx.strokeStyle = 'grey';
-    this.ctx.fillStyle = 'grey';
+    this.ctx.strokeStyle = 'black';
+    this.ctx.fillStyle = 'black';
+    this.ctx.lineWidth = 1;
+
     this.ctx.beginPath();
     this.ctx.moveTo(this.left.right, 0);
     this.ctx.lineTo(this.left.right, this.height);
@@ -74,7 +76,51 @@ export default class Canvas {
 
     this.ctx.font = "20px sans-serif";
     this.ctx.fillText("Phase Portrait", this.upperRight.left + 5, this.upperRight.top + 20);
-    this.ctx.fillText("Poincaré Map", this.lowerRight.left + 5, this.lowerRight.top + 20);
+    this.ctx.fillText("Poincaré Map (ϕ = 0)", this.lowerRight.left + 5, this.lowerRight.top + 20);
+  }
+
+  drawAxes(area: Area, size: number, tick: number) {
+    const scale = (this.upperRight.width - 10) / (2*size); //symmetric
+    const numTicksX = Math.floor(area.width / (2 * tick * scale));
+    const numTicksY = Math.floor(area.height / (2 * tick * scale));
+
+    this.ctx.strokeStyle = 'grey';
+    this.ctx.fillStyle = 'grey';
+    this.ctx.lineWidth = 1;
+
+    this.ctx.beginPath();
+    this.ctx.moveTo(area.center.x, area.top);
+    this.ctx.lineTo(area.center.x, area.bottom);
+    this.ctx.stroke();
+
+    this.ctx.beginPath();
+    this.ctx.moveTo(area.left, area.center.y);
+    this.ctx.lineTo(area.right, area.center.y);
+    this.ctx.stroke();
+
+    for (let i=0; i <= numTicksX; i++) {
+      this.ctx.beginPath();
+      this.ctx.moveTo(area.center.x + i*scale*tick, area.center.y + 10);
+      this.ctx.lineTo(area.center.x + i*scale*tick, area.center.y - 10);
+      this.ctx.stroke();
+
+      this.ctx.beginPath();
+      this.ctx.moveTo(area.center.x - i*scale*tick, area.center.y + 10);
+      this.ctx.lineTo(area.center.x - i*scale*tick, area.center.y - 10);
+      this.ctx.stroke();
+    }
+
+    for (let i=0; i <= numTicksY; i++) {
+      this.ctx.beginPath();
+      this.ctx.moveTo(area.center.x + 10, area.center.y + i*scale*tick);
+      this.ctx.lineTo(area.center.x - 10, area.center.y + i*scale*tick);
+      this.ctx.stroke();
+
+      this.ctx.beginPath();
+      this.ctx.moveTo(area.center.x + 10, area.center.y - i*scale*tick);
+      this.ctx.lineTo(area.center.x - 10, area.center.y - i*scale*tick);
+      this.ctx.stroke();
+    }
   }
 
   clearLeft() {

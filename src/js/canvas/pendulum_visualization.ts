@@ -25,6 +25,9 @@ export default class PendulumVisualization extends Canvas {
     this.clearAll();
     this.drawBoundaries();
     this.drawPendulum();
+    this.drawPhaseHistory();
+    this.drawPoincareSection();
+
   }
 
   start() {
@@ -51,9 +54,9 @@ export default class PendulumVisualization extends Canvas {
   tick(): number | undefined {
     this.clearAll();
     this.drawBoundaries();
-    this.drawPendulum();
     this.drawPhaseHistory();
     this.drawPoincareSection();
+    this.drawPendulum();
 
     this.simulation.tick(this.speed, this.damping, this.driveAmplitude, this.driveFrequency);
     if (this.running) {
@@ -95,8 +98,10 @@ export default class PendulumVisualization extends Canvas {
 
   drawPhaseHistory() {
     const center = this.upperRight.center;
-    const scale = (this.upperRight.width - 10) / (4*Math.PI);
+    const scale = (this.upperRight.width - 10) / (2*Math.PI);
     const { theta, omega } = this.simulation;
+
+    this.drawAxes(this.upperRight, Math.PI, 0.5*Math.PI);
 
     this.ctx.beginPath();
     var [lastT, lastO] = [theta, omega];
@@ -128,6 +133,7 @@ export default class PendulumVisualization extends Canvas {
   drawPoincareSection() {
     const center = this.lowerRight.center;
     const scale = (this.lowerRight.width - 10) / (2*Math.PI);
+    this.drawAxes(this.lowerRight, Math.PI, 0.5*Math.PI);
 
     for (let i = 0; i < this.simulation.poincareSize; i++) {
       const [thisT, thisO] = [

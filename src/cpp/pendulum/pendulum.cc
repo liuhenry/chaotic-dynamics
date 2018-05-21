@@ -96,9 +96,10 @@ void Pendulum::tick(double speed, double damping, double amplitude,
     // wrapped_theta: [-2π, 2π) - extended range to allow basin visualization
     // wrapped_phi: [0, 2π)
     // poincare_theta: [-π, π)
-    const double wrapped_theta = wrapMinMax(theta, -M_PI * 2, M_PI * 2);
+    // const double wrapped_theta = wrapMinMax(theta, -M_PI * 2, M_PI * 2);
     const double wrapped_phi = wrapMax(phi, M_PI * 2);
     const double poincare_theta = wrapMinMax(theta, -M_PI, M_PI);
+    const double wrapped_theta = poincare_theta;
 
     _integrator[0] = wrapped_theta;
     _integrator[2] = wrapped_phi;

@@ -78,6 +78,7 @@ class Controls extends React.Component<Props, State> {
             <Slider
               min={-180}
               max={180}
+              step={15}
               marks={{
                 '-180': '-180',
                 '-90': '-90',
@@ -97,16 +98,15 @@ class Controls extends React.Component<Props, State> {
           <div className="fl w-10 pa2 pl0">{omega}</div>
           <div className="fl w-90 pa2 pl3">
             <Slider
-              min={-270}
-              max={270}
+              min={-180}
+              max={180}
+              step={15}
               marks={{
-                '-270': '-270',
                 '-180': '-180',
                 '-90': '-90',
                 '0': '0',
                 '90': '90',
                 '180': '180',
-                '270': '270'
               }}
               value={omega}
               onChange={this.props.onOmegaChange.bind(this)}
@@ -122,12 +122,12 @@ class Controls extends React.Component<Props, State> {
             <Slider
               min={0}
               max={1}
+              step={0.01}
               marks={{
                 '0': '0',
                 '0.5': '0.5',
                 '1': '1'
               }}
-              step={0.01}
               value={damping}
               onChange={this.props.onDampingChange.bind(this)}
             />
@@ -142,6 +142,7 @@ class Controls extends React.Component<Props, State> {
             <Slider
               min={0}
               max={2}
+              step={0.001}
               marks={{
                 '0': '0',
                 '0.5': '0.5',
@@ -149,7 +150,6 @@ class Controls extends React.Component<Props, State> {
                 '1.5': '1.5',
                 '2': '2'
               }}
-              step={0.01}
               value={driveAmplitude}
               onChange={this.props.onDriveAmplitudeChange.bind(this)}
             />
@@ -164,13 +164,13 @@ class Controls extends React.Component<Props, State> {
             <Slider
               min={0}
               max={2}
+              step={0.001}
               marks={{
                 '0': '0',
                 '0.667': '0.667',
                 '1': '1',
                 '2': '2'
               }}
-              step={0.001}
               value={driveFrequency}
               onChange={this.props.onDriveFrequencyChange.bind(this)}
             />
@@ -185,13 +185,13 @@ class Controls extends React.Component<Props, State> {
             <Slider
               min={1}
               max={4}
+              step={null}
               marks={{
                 1: 'Normal',
                 2: 'Double',
                 3: 'Fast',
                 4: 'Plotter'
               }}
-              step={null}
               value={this.state.simulationSpeedMode}
               onChange={this.onSimulationSpeedChange.bind(this)}
             />
@@ -209,7 +209,7 @@ class Controls extends React.Component<Props, State> {
         </div>
         <div className="ph3 flex items-center">
           {!this.props.running ?
-          <a className="center f6 link dim br-pill ba bw1 ph3 pv2 mb2 dib dark-blue"
+          <a className="center f6 link dim br-pill ph3 pv2 mb2 dib white bg-dark-blue"
             onClick={this.props.run.bind(this)}>
             Run Simulation
           </a> :
@@ -265,7 +265,7 @@ function mapDispatchToProps(dispatch: Dispatch) {
       dispatch(changeDamping(Number(Math.round(Number(value + 'e3')) + 'e-3')));
     },
     onDriveAmplitudeChange(value: number) {
-      dispatch(changeDriveAmplitude(Number(Math.round(Number(value + 'e3')) + 'e-3')));
+      dispatch(changeDriveAmplitude(Number(Math.round(Number(value + 'e4')) + 'e-4')));
     },
     onDriveFrequencyChange(value: number) {
       dispatch(changeDriveFrequency(Number(Math.round(Number(value + 'e4')) + 'e-4')));
