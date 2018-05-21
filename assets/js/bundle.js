@@ -32167,6 +32167,7 @@ exports.Actions = {
     INITIALIZED: 'INITIALIZED',
     RUN_SIMULATION: 'RUN_SIMULATION',
     STOP_SIMULATION: 'STOP_SIMULATION',
+    CHANGE_SIMULATION_SPEED: 'CHANGE_SIMULATION_SPEED',
     CHANGE_START_THETA: 'CHANGE_START_THETA',
     CHANGE_START_OMEGA: 'CHANGE_START_OMEGA',
     CHANGE_DAMPING: 'CHANGE_DAMPING',
@@ -32191,6 +32192,13 @@ function stopSimulation() {
     };
 }
 exports.stopSimulation = stopSimulation;
+function changeSimulationSpeed(value) {
+    return {
+        type: exports.Actions.CHANGE_SIMULATION_SPEED,
+        value: value
+    };
+}
+exports.changeSimulationSpeed = changeSimulationSpeed;
 function changeStartTheta(value) {
     return {
         type: exports.Actions.CHANGE_START_THETA,
@@ -32391,6 +32399,7 @@ var PendulumVisualization = function (_canvas_1$default) {
 
         _this.simulation = simulation;
         _this.running = false;
+        _this.speed = 1;
         _this.damping = 0;
         _this.driveAmplitude = 0;
         _this.driveFrequency = 0;
@@ -32418,7 +32427,8 @@ var PendulumVisualization = function (_canvas_1$default) {
         }
     }, {
         key: "setParameters",
-        value: function setParameters(damping, driveAmplitude, driveFrequency) {
+        value: function setParameters(speed, damping, driveAmplitude, driveFrequency) {
+            this.speed = speed * 5;
             this.damping = damping;
             this.driveAmplitude = driveAmplitude;
             this.driveFrequency = driveFrequency;
@@ -32431,7 +32441,7 @@ var PendulumVisualization = function (_canvas_1$default) {
             this.clearLeft();
             this.drawPendulum();
             this.drawPhaseHistory();
-            this.simulation.tick(this.damping, this.driveAmplitude, this.driveFrequency);
+            this.simulation.tick(this.speed, this.damping, this.driveAmplitude, this.driveFrequency);
             if (this.running) {
                 return requestAnimationFrame(function () {
                     _this2.tick();
@@ -32746,11 +32756,12 @@ var Canvas = function (_React$Component) {
                     }
                     var simulation = new pendulum_visualization_1.default(this.state.canvas, model);
                     var _props$parameters = this.props.parameters,
+                        speed = _props$parameters.simulationSpeed,
                         damping = _props$parameters.damping,
                         driveAmplitude = _props$parameters.driveAmplitude,
                         driveFrequency = _props$parameters.driveFrequency;
 
-                    simulation.setParameters(damping, driveAmplitude, driveFrequency);
+                    simulation.setParameters(speed, damping, driveAmplitude, driveFrequency);
                     simulation.initialize();
                     this.setState({
                         model: model,
@@ -32761,11 +32772,12 @@ var Canvas = function (_React$Component) {
                 if (this.state.simulation) {
                     if (JSON.stringify(this.props.parameters) !== JSON.stringify(prevProps.parameters)) {
                         var _props$parameters2 = this.props.parameters,
+                            _speed = _props$parameters2.simulationSpeed,
                             _damping = _props$parameters2.damping,
                             _driveAmplitude = _props$parameters2.driveAmplitude,
                             _driveFrequency = _props$parameters2.driveFrequency;
 
-                        this.state.simulation.setParameters(_damping, _driveAmplitude, _driveFrequency);
+                        this.state.simulation.setParameters(_speed, _damping, _driveAmplitude, _driveFrequency);
                     }
                     if (this.props.running) {
                         if (!prevProps.running) {
@@ -32855,23 +32867,42 @@ __webpack_require__(/*! rc-slider/assets/index.css */ "./node_modules/rc-slider/
 var Controls = function (_React$Component) {
     _inherits(Controls, _React$Component);
 
-    function Controls() {
+    function Controls(props, context) {
         _classCallCheck(this, Controls);
 
-        return _possibleConstructorReturn(this, (Controls.__proto__ || Object.getPrototypeOf(Controls)).apply(this, arguments));
+        var _this = _possibleConstructorReturn(this, (Controls.__proto__ || Object.getPrototypeOf(Controls)).call(this, props, context));
+
+        _this.state = {
+            simulationSpeedMode: 1
+        };
+        return _this;
     }
 
     _createClass(Controls, [{
+        key: "onSimulationSpeedChange",
+        value: function onSimulationSpeedChange(value) {
+            this.setState({
+                simulationSpeedMode: value
+            });
+            this.props.onSimulationSpeedChange(value);
+        }
+    }, {
         key: "render",
         value: function render() {
             var _props = this.props,
+                simulationSpeed = _props.simulationSpeed,
                 theta = _props.theta,
                 omega = _props.omega,
                 damping = _props.damping,
                 driveAmplitude = _props.driveAmplitude,
                 driveFrequency = _props.driveFrequency;
 
-            return React.createElement("div", null, React.createElement("div", { className: "tc pb3" }, "Starting Angle", React.createElement("div", { className: "flex items-center" }, React.createElement("div", { className: "fl w-10 pa2" }, theta), React.createElement("div", { className: "fl w-90 pa2 pl3" }, React.createElement(rc_slider_1.default, { min: -180, max: 180, value: theta, onChange: this.props.onThetaChange.bind(this) })))), React.createElement("div", { className: "tc pb3" }, "Starting Angular Velocity", React.createElement("div", { className: "flex items-center" }, React.createElement("div", { className: "fl w-10 pa2" }, omega), React.createElement("div", { className: "fl w-90 pa2 pl3" }, React.createElement(rc_slider_1.default, { min: -270, max: 270, value: omega, onChange: this.props.onOmegaChange.bind(this) })))), React.createElement("div", { className: "tc pb3" }, "Damping", React.createElement("div", { className: "flex items-center" }, React.createElement("div", { className: "fl w-10 pa2" }, damping), React.createElement("div", { className: "fl w-90 pa2 pl3" }, React.createElement(rc_slider_1.default, { min: 0, max: 1, step: 0.01, value: damping, onChange: this.props.onDampingChange.bind(this) })))), React.createElement("div", { className: "tc pb3" }, "Drive Amplitude", React.createElement("div", { className: "flex items-center" }, React.createElement("div", { className: "fl w-10 pa2" }, driveAmplitude), React.createElement("div", { className: "fl w-90 pa2 pl3" }, React.createElement(rc_slider_1.default, { min: 0, max: 2, step: 0.01, value: driveAmplitude, onChange: this.props.onDriveAmplitudeChange.bind(this) })))), React.createElement("div", { className: "tc pb3" }, "Drive Frequency", React.createElement("div", { className: "flex items-center" }, React.createElement("div", { className: "fl w-10 pa2" }, driveFrequency), React.createElement("div", { className: "fl w-90 pa2 pl3" }, React.createElement(rc_slider_1.default, { min: 0, max: 2, step: 0.001, value: driveFrequency, onChange: this.props.onDriveFrequencyChange.bind(this) })))), React.createElement("div", { className: "ph3 flex items-center" }, !this.props.running ? React.createElement("a", { className: "center f6 link dim br-pill ba bw1 ph3 pv2 mb2 dib dark-blue", onClick: this.props.run.bind(this) }, "Run Simulation") : React.createElement("a", { className: "center f6 link dim br-pill ba bw1 ph3 pv2 mb2 dib dark-blue", onClick: this.props.stop.bind(this) }, "Stop Simulation")));
+            return React.createElement("div", null, React.createElement("div", { className: "tc pb3" }, "Starting Angle", React.createElement("div", { className: "flex items-center" }, React.createElement("div", { className: "fl w-10 pa2" }, theta), React.createElement("div", { className: "fl w-90 pa2 pl3" }, React.createElement(rc_slider_1.default, { min: -180, max: 180, value: theta, onChange: this.props.onThetaChange.bind(this) })))), React.createElement("div", { className: "tc pb3" }, "Starting Angular Velocity", React.createElement("div", { className: "flex items-center" }, React.createElement("div", { className: "fl w-10 pa2" }, omega), React.createElement("div", { className: "fl w-90 pa2 pl3" }, React.createElement(rc_slider_1.default, { min: -270, max: 270, value: omega, onChange: this.props.onOmegaChange.bind(this) })))), React.createElement("div", { className: "tc pb3" }, "Damping", React.createElement("div", { className: "flex items-center" }, React.createElement("div", { className: "fl w-10 pa2" }, damping), React.createElement("div", { className: "fl w-90 pa2 pl3" }, React.createElement(rc_slider_1.default, { min: 0, max: 1, step: 0.01, value: damping, onChange: this.props.onDampingChange.bind(this) })))), React.createElement("div", { className: "tc pb3" }, "Drive Amplitude", React.createElement("div", { className: "flex items-center" }, React.createElement("div", { className: "fl w-10 pa2" }, driveAmplitude), React.createElement("div", { className: "fl w-90 pa2 pl3" }, React.createElement(rc_slider_1.default, { min: 0, max: 2, step: 0.01, value: driveAmplitude, onChange: this.props.onDriveAmplitudeChange.bind(this) })))), React.createElement("div", { className: "tc pb3" }, "Drive Frequency", React.createElement("div", { className: "flex items-center" }, React.createElement("div", { className: "fl w-10 pa2" }, driveFrequency), React.createElement("div", { className: "fl w-90 pa2 pl3" }, React.createElement(rc_slider_1.default, { min: 0, max: 2, step: 0.001, value: driveFrequency, onChange: this.props.onDriveFrequencyChange.bind(this) })))), React.createElement("div", { className: "tc pb3" }, "Simulation Speed", React.createElement("div", { className: "flex items-center" }, React.createElement("div", { className: "fl w-10 pa2" }, simulationSpeed), React.createElement("div", { className: "fl w-90 pa2 pl3" }, React.createElement(rc_slider_1.default, { min: 1, max: 4, marks: {
+                    1: 'Normal',
+                    2: 'Double',
+                    3: 'Fast',
+                    4: 'Plotter'
+                }, step: null, value: this.state.simulationSpeedMode, onChange: this.onSimulationSpeedChange.bind(this) })))), React.createElement("div", { className: "ph3 flex items-center" }, !this.props.running ? React.createElement("a", { className: "center f6 link dim br-pill ba bw1 ph3 pv2 mb2 dib dark-blue", onClick: this.props.run.bind(this) }, "Run Simulation") : React.createElement("a", { className: "center f6 link dim br-pill ba bw1 ph3 pv2 mb2 dib dark-blue", onClick: this.props.stop.bind(this) }, "Stop Simulation")));
         }
     }]);
 
@@ -32881,6 +32912,7 @@ var Controls = function (_React$Component) {
 function mapStateToProps(state) {
     return {
         running: state.simulation.running,
+        simulationSpeed: state.parameters.simulationSpeed,
         theta: state.parameters.startTheta,
         omega: state.parameters.startOmega,
         damping: state.parameters.damping,
@@ -32895,6 +32927,18 @@ function mapDispatchToProps(dispatch) {
         },
         stop: function stop() {
             dispatch(simulation_1.stopSimulation());
+        },
+        onSimulationSpeedChange: function onSimulationSpeedChange(value) {
+            switch (value) {
+                case 1:
+                    return dispatch(simulation_1.changeSimulationSpeed(1));
+                case 2:
+                    return dispatch(simulation_1.changeSimulationSpeed(2));
+                case 3:
+                    return dispatch(simulation_1.changeSimulationSpeed(5));
+                case 4:
+                    return dispatch(simulation_1.changeSimulationSpeed(500));
+            }
         },
         onThetaChange: function onThetaChange(value) {
             dispatch(simulation_1.changeStartTheta(value));
@@ -32974,13 +33018,16 @@ var initialParameters = {
     startOmega: 0,
     damping: 0,
     driveAmplitude: 0,
-    driveFrequency: 0
+    driveFrequency: 0,
+    simulationSpeed: 1
 };
 function parameters() {
     var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : initialParameters;
     var action = arguments[1];
 
     switch (action.type) {
+        case simulation_1.Actions.CHANGE_SIMULATION_SPEED:
+            return Object.assign({}, state, { simulationSpeed: action.value });
         case simulation_1.Actions.CHANGE_START_THETA:
             return Object.assign({}, state, { startTheta: action.value });
         case simulation_1.Actions.CHANGE_START_OMEGA:
