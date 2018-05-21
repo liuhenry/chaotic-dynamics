@@ -23,6 +23,7 @@ import PendulumVisualization from '../canvas/pendulum_visualization';
 interface Props {
   initialized: false;
   running: boolean;
+  speed: number;
   parameters: ParameterState;
   stop(): void;
 }
@@ -64,9 +65,10 @@ class Canvas extends React.Component<Props, State> {
 
         const simulation = new PendulumVisualization(this.state.canvas, model);
         const {
-          simulationSpeed: speed, damping, driveAmplitude, driveFrequency
+          damping, driveAmplitude, driveFrequency
         } = this.props.parameters;
-        simulation.setParameters(speed, damping, driveAmplitude, driveFrequency);
+        simulation.setSpeed(this.props.speed);
+        simulation.setParameters(damping, driveAmplitude, driveFrequency);
         simulation.initialize();
         this.setState({
           model,
@@ -76,11 +78,14 @@ class Canvas extends React.Component<Props, State> {
       }
 
       if (this.state.simulation) {
+        if (this.props.speed !== prevProps.speed) {
+          this.state.simulation.setSpeed(this.props.speed);
+        }
         if (JSON.stringify(this.props.parameters) !== JSON.stringify(prevProps.parameters)) {
           const {
             simulationSpeed: speed, damping, driveAmplitude, driveFrequency
           } = this.props.parameters;
-          this.state.simulation.setParameters(speed, damping, driveAmplitude, driveFrequency);
+          this.state.simulation.setParameters(damping, driveAmplitude, driveFrequency);
         }
 
         if (this.props.running) {
@@ -104,10 +109,12 @@ class Canvas extends React.Component<Props, State> {
 }
 
 function mapStateToProps(state: StoreState) {
+  const {simulationSpeed: speed, ...parameters} = state.parameters;
   return {
     initialized: state.simulation.initialized,
     running: state.simulation.running,
-    parameters: state.parameters
+    speed,
+    parameters
   };
 }
 

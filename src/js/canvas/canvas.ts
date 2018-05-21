@@ -47,6 +47,14 @@ export default class Canvas {
     };
   }
 
+  static outOfBounds(x: number, y: number, area: Area): boolean {
+    if (x > area.right || x < area.left || y > area.bottom || y < area.top) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   clearAll() {
     this.ctx.clearRect(0, 0, this.width, this.height);
   }

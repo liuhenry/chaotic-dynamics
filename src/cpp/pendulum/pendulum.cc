@@ -35,13 +35,20 @@ class Pendulum {
 
   double theta() const { return _integrator[0]; }
   double omega() const { return _integrator[1]; }
+  double phi() const { return _integrator[2]; }
   double drive() const { return _drive; }
 
   int historySize() const { return _phase_history.size(); }
   double theta(int idx) const { return get<0>(_phase_history[idx]); }
   double omega(int idx) const { return get<1>(_phase_history[idx]); }
+  double phi(int idx) const { return get<2>(_phase_history[idx]); }
+
+  int poincareSize() const { return _phase_slice.size(); }
+  double poincareTheta(int idx) const { return get<0>(_phase_slice[idx]); }
+  double poincareOmega(int idx) const { return get<1>(_phase_slice[idx]); }
 
   void tick(double, double, double, double);
+  void clearPoincare() { _phase_slice.clear(); }
 };
 
 vector<double> Pendulum::eom(double t, const vector<double> &params,
@@ -71,15 +78,27 @@ void Pendulum::tick(double speed, double damping, double amplitude, double frequ
     _drive = amplitude * cos(phi);
 
     // https://stackoverflow.com/questions/4633177/c-how-to-wrap-a-float-to-the-interval-pi-pi
-    theta =
-        -M_PI * 2 + fmod(M_PI * 4 + fmod(theta + M_PI * 2, M_PI * 4), M_PI * 4);
+    double wrapped_theta =
+        -M_PI*2 + fmod(M_PI*4 + fmod(theta + M_PI*2, M_PI*4), M_PI*4);
+    double wrapped_phi = fmod(M_PI*2 + fmod(phi, M_PI*2), M_PI*2);
+    double poincare_theta =
+        -M_PI + fmod(M_PI*2 + fmod(theta + M_PI, M_PI*2), M_PI*2);
 
-    _integrator[0] = theta;
+    _integrator[0] = wrapped_theta;
+    _integrator[2] = wrapped_phi;
 
     if (i%5 == 0) {
-      _phase_history.push_front({theta, omega, phi});
-      if (_phase_history.size() > 50000) {
+      _phase_history.push_front({wrapped_theta, omega, wrapped_phi});
+      if (_phase_history.size() > 10000) {
         _phase_history.pop_back();
+      }
+    }
+    const double epsilon = 1e-2;
+    const bool phiZero = std::abs(wrapped_phi) <= epsilon * std::abs(wrapped_phi);
+    if (phiZero || get<2>(_phase_history.front()) > wrapped_phi) {
+      _phase_slice.push_front({poincare_theta, omega});
+      if (_phase_slice.size() > 10000) {
+        _phase_slice.pop_back();
       }
     }
   }
@@ -92,11 +111,21 @@ EMSCRIPTEN_BINDINGS(pendulum) {
       .function("tick", &Pendulum::tick)
       .property("theta", select_overload<double() const>(&Pendulum::theta))
       .property("omega", select_overload<double() const>(&Pendulum::omega))
+      .property("phi", select_overload<double() const>(&Pendulum::phi))
       .property("drive", select_overload<double() const>(&Pendulum::drive))
       .property("historySize", &Pendulum::historySize)
       .function("theta_idx",
                 select_overload<double(int) const>(&Pendulum::theta))
       .function("omega_idx",
-                select_overload<double(int) const>(&Pendulum::omega));
+                select_overload<double(int) const>(&Pendulum::omega))
+      .function("phi_idx",
+                select_overload<double(int) const>(&Pendulum::phi))
+      .property("poincareSize", &Pendulum::poincareSize)
+      .function("poincare_theta",
+                select_overload<double(int) const>(&Pendulum::poincareTheta))
+      .function("poincare_omega",
+                select_overload<double(int) const>(&Pendulum::poincareOmega))
+      .function("clear_poincare", &Pendulum::clearPoincare)
+      ;
 }
 #endif

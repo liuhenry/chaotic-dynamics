@@ -201,7 +201,7 @@ function mapDispatchToProps(dispatch: Dispatch) {
         case 3:
           return dispatch(changeSimulationSpeed(5));
         case 4:
-          return dispatch(changeSimulationSpeed(500));
+          return dispatch(changeSimulationSpeed(1000));
       }
     },
     onThetaChange(value: number) {

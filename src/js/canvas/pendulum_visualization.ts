@@ -37,11 +37,15 @@ export default class PendulumVisualization extends Canvas {
     cancelAnimationFrame(this.animationID as number);
   }
 
-  setParameters(speed: number, damping: number, driveAmplitude: number, driveFrequency: number) {
+  setSpeed(speed: number) {
     this.speed = speed * 5;
+  }
+
+  setParameters(damping: number, driveAmplitude: number, driveFrequency: number) {
     this.damping = damping;
     this.driveAmplitude = driveAmplitude;
     this.driveFrequency = driveFrequency;
+    this.simulation.clear_poincare();
   }
 
   tick(): number | undefined {
@@ -49,6 +53,7 @@ export default class PendulumVisualization extends Canvas {
 
     this.drawPendulum();
     this.drawPhaseHistory();
+    this.drawPoincareSection();
 
     this.simulation.tick(this.speed, this.damping, this.driveAmplitude, this.driveFrequency);
     if (this.running) {
@@ -107,13 +112,51 @@ export default class PendulumVisualization extends Canvas {
         this.ctx.stroke();
         this.ctx.beginPath();
       }
-      this.drawPhasePoint(x, y, {connect: true});
       [lastT, lastO] = [thisT, thisO];
+      if (Canvas.outOfBounds(x, y, this.upperRight)) {
+        continue;
+      }
+      this.drawPhasePoint(x, y, {connect: true});
     }
     this.ctx.stroke();
 
     const [x, y] = [theta * scale + center.x, -omega * scale + center.y];
-    this.drawPhasePoint(x, y, {current: true});
+    if (!Canvas.outOfBounds(x, y, this.upperRight)) {
+      this.drawPhasePoint(x, y, {current: true});
+    }
+  }
+
+  drawPoincareSection() {
+    const center = this.lowerRight.center;
+    const scale = (this.lowerRight.width - 10) / (2*Math.PI);
+
+    this.clearLowerRight();
+    for (let i = 0; i < this.simulation.poincareSize; i++) {
+      const [thisT, thisO] = [
+        this.simulation.poincare_theta(i),
+        this.simulation.poincare_omega(i)
+      ];
+      const [x, y] = [thisT * scale + center.x, -thisO * scale + center.y];
+      if (Canvas.outOfBounds(x, y, this.lowerRight)) {
+        continue;
+      }
+      this.ctx.beginPath();
+      this.ctx.arc(x, y, this.lowerRight.width/500, 0, 2*Math.PI);
+      this.ctx.fillStyle = 'black';
+      this.ctx.fill();
+    }
+    if (this.simulation.poincareSize) {
+      const [ theta, omega ] = [
+        this.simulation.poincare_theta(0),
+        this.simulation.poincare_omega(0)];
+      const [x, y] = [theta * scale + center.x, -omega * scale + center.y];
+      if (!Canvas.outOfBounds(x, y, this.lowerRight)) {
+        this.ctx.beginPath();
+        this.ctx.arc(x, y, this.lowerRight.width/100, 0, 2 * Math.PI);
+        this.ctx.fillStyle = 'red';
+        this.ctx.fill();
+      }
+    }
   }
 
   drawPhasePoint(x: number, y: number, {current = false, connect = false}) {
