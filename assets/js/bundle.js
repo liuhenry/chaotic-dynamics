@@ -32296,8 +32296,9 @@ var Canvas = function () {
     }, {
         key: "drawBoundaries",
         value: function drawBoundaries() {
-            this.ctx.strokeStyle = 'grey';
-            this.ctx.fillStyle = 'grey';
+            this.ctx.strokeStyle = 'black';
+            this.ctx.fillStyle = 'black';
+            this.ctx.lineWidth = 1;
             this.ctx.beginPath();
             this.ctx.moveTo(this.left.right, 0);
             this.ctx.lineTo(this.left.right, this.height);
@@ -32308,7 +32309,45 @@ var Canvas = function () {
             this.ctx.stroke();
             this.ctx.font = "20px sans-serif";
             this.ctx.fillText("Phase Portrait", this.upperRight.left + 5, this.upperRight.top + 20);
-            this.ctx.fillText("Poincaré Map", this.lowerRight.left + 5, this.lowerRight.top + 20);
+            this.ctx.fillText("Poincaré Map (ϕ = 0)", this.lowerRight.left + 5, this.lowerRight.top + 20);
+        }
+    }, {
+        key: "drawAxes",
+        value: function drawAxes(area, size, tick) {
+            var scale = (this.upperRight.width - 10) / (2 * size); //symmetric
+            var numTicksX = Math.floor(area.width / (2 * tick * scale));
+            var numTicksY = Math.floor(area.height / (2 * tick * scale));
+            this.ctx.strokeStyle = 'grey';
+            this.ctx.fillStyle = 'grey';
+            this.ctx.lineWidth = 1;
+            this.ctx.beginPath();
+            this.ctx.moveTo(area.center.x, area.top);
+            this.ctx.lineTo(area.center.x, area.bottom);
+            this.ctx.stroke();
+            this.ctx.beginPath();
+            this.ctx.moveTo(area.left, area.center.y);
+            this.ctx.lineTo(area.right, area.center.y);
+            this.ctx.stroke();
+            for (var i = 0; i <= numTicksX; i++) {
+                this.ctx.beginPath();
+                this.ctx.moveTo(area.center.x + i * scale * tick, area.center.y + 10);
+                this.ctx.lineTo(area.center.x + i * scale * tick, area.center.y - 10);
+                this.ctx.stroke();
+                this.ctx.beginPath();
+                this.ctx.moveTo(area.center.x - i * scale * tick, area.center.y + 10);
+                this.ctx.lineTo(area.center.x - i * scale * tick, area.center.y - 10);
+                this.ctx.stroke();
+            }
+            for (var _i = 0; _i <= numTicksY; _i++) {
+                this.ctx.beginPath();
+                this.ctx.moveTo(area.center.x + 10, area.center.y + _i * scale * tick);
+                this.ctx.lineTo(area.center.x - 10, area.center.y + _i * scale * tick);
+                this.ctx.stroke();
+                this.ctx.beginPath();
+                this.ctx.moveTo(area.center.x + 10, area.center.y - _i * scale * tick);
+                this.ctx.lineTo(area.center.x - 10, area.center.y - _i * scale * tick);
+                this.ctx.stroke();
+            }
         }
     }, {
         key: "clearLeft",
@@ -32433,6 +32472,8 @@ var PendulumVisualization = function (_canvas_1$default) {
             this.clearAll();
             this.drawBoundaries();
             this.drawPendulum();
+            this.drawPhaseHistory();
+            this.drawPoincareSection();
         }
     }, {
         key: "start",
@@ -32466,9 +32507,9 @@ var PendulumVisualization = function (_canvas_1$default) {
 
             this.clearAll();
             this.drawBoundaries();
-            this.drawPendulum();
             this.drawPhaseHistory();
             this.drawPoincareSection();
+            this.drawPendulum();
             this.simulation.tick(this.speed, this.damping, this.driveAmplitude, this.driveFrequency);
             if (this.running) {
                 return requestAnimationFrame(function () {
@@ -32514,11 +32555,12 @@ var PendulumVisualization = function (_canvas_1$default) {
         key: "drawPhaseHistory",
         value: function drawPhaseHistory() {
             var center = this.upperRight.center;
-            var scale = (this.upperRight.width - 10) / (4 * Math.PI);
+            var scale = (this.upperRight.width - 10) / (2 * Math.PI);
             var _simulation2 = this.simulation,
                 theta = _simulation2.theta,
                 omega = _simulation2.omega;
 
+            this.drawAxes(this.upperRight, Math.PI, 0.5 * Math.PI);
             this.ctx.beginPath();
             var lastT = theta,
                 lastO = omega;
@@ -32557,6 +32599,7 @@ var PendulumVisualization = function (_canvas_1$default) {
         value: function drawPoincareSection() {
             var center = this.lowerRight.center;
             var scale = (this.lowerRight.width - 10) / (2 * Math.PI);
+            this.drawAxes(this.lowerRight, Math.PI, 0.5 * Math.PI);
             for (var i = 0; i < this.simulation.poincareSize; i++) {
                 var _ref2 = [this.simulation.poincare_theta(i), this.simulation.poincare_omega(i)],
                     thisT = _ref2[0],
@@ -32987,41 +33030,39 @@ var Controls = function (_React$Component) {
                 driveAmplitude = _props.driveAmplitude,
                 driveFrequency = _props.driveFrequency;
 
-            return React.createElement("div", null, React.createElement("div", { className: "tc pb3" }, "Starting Angle", React.createElement("div", { className: "flex items-center" }, React.createElement("div", { className: "fl w-10 pa2 pl0" }, theta), React.createElement("div", { className: "fl w-90 pa2 pl3" }, React.createElement(rc_slider_1.default, { min: -180, max: 180, marks: {
+            return React.createElement("div", null, React.createElement("div", { className: "tc pb3" }, "Starting Angle", React.createElement("div", { className: "flex items-center" }, React.createElement("div", { className: "fl w-10 pa2 pl0" }, theta), React.createElement("div", { className: "fl w-90 pa2 pl3" }, React.createElement(rc_slider_1.default, { min: -180, max: 180, step: 15, marks: {
                     '-180': '-180',
                     '-90': '-90',
                     '0': '0',
                     '90': '90',
                     '180': '180'
-                }, value: theta, onChange: this.props.onThetaChange.bind(this) })))), React.createElement("div", { className: "tc pb3" }, "Starting Angular Velocity", React.createElement("div", { className: "flex items-center" }, React.createElement("div", { className: "fl w-10 pa2 pl0" }, omega), React.createElement("div", { className: "fl w-90 pa2 pl3" }, React.createElement(rc_slider_1.default, { min: -270, max: 270, marks: {
-                    '-270': '-270',
+                }, value: theta, onChange: this.props.onThetaChange.bind(this) })))), React.createElement("div", { className: "tc pb3" }, "Starting Angular Velocity", React.createElement("div", { className: "flex items-center" }, React.createElement("div", { className: "fl w-10 pa2 pl0" }, omega), React.createElement("div", { className: "fl w-90 pa2 pl3" }, React.createElement(rc_slider_1.default, { min: -180, max: 180, step: 15, marks: {
                     '-180': '-180',
                     '-90': '-90',
                     '0': '0',
                     '90': '90',
-                    '180': '180',
-                    '270': '270'
-                }, value: omega, onChange: this.props.onOmegaChange.bind(this) })))), React.createElement("div", { className: "tc pb3" }, "Damping", React.createElement("div", { className: "flex items-center" }, React.createElement("div", { className: "fl w-10 pa2 pl0" }, damping), React.createElement("div", { className: "fl w-90 pa2 pl3" }, React.createElement(rc_slider_1.default, { min: 0, max: 1, marks: {
+                    '180': '180'
+                }, value: omega, onChange: this.props.onOmegaChange.bind(this) })))), React.createElement("div", { className: "tc pb3" }, "Damping", React.createElement("div", { className: "flex items-center" }, React.createElement("div", { className: "fl w-10 pa2 pl0" }, damping), React.createElement("div", { className: "fl w-90 pa2 pl3" }, React.createElement(rc_slider_1.default, { min: 0, max: 1, step: 0.01, marks: {
                     '0': '0',
                     '0.5': '0.5',
                     '1': '1'
-                }, step: 0.01, value: damping, onChange: this.props.onDampingChange.bind(this) })))), React.createElement("div", { className: "tc pb3" }, "Drive Amplitude", React.createElement("div", { className: "flex items-center" }, React.createElement("div", { className: "fl w-10 pa2 pl0" }, driveAmplitude), React.createElement("div", { className: "fl w-90 pa2 pl3" }, React.createElement(rc_slider_1.default, { min: 0, max: 2, marks: {
+                }, value: damping, onChange: this.props.onDampingChange.bind(this) })))), React.createElement("div", { className: "tc pb3" }, "Drive Amplitude", React.createElement("div", { className: "flex items-center" }, React.createElement("div", { className: "fl w-10 pa2 pl0" }, driveAmplitude), React.createElement("div", { className: "fl w-90 pa2 pl3" }, React.createElement(rc_slider_1.default, { min: 0, max: 2, step: 0.001, marks: {
                     '0': '0',
                     '0.5': '0.5',
                     '1': '1',
                     '1.5': '1.5',
                     '2': '2'
-                }, step: 0.01, value: driveAmplitude, onChange: this.props.onDriveAmplitudeChange.bind(this) })))), React.createElement("div", { className: "tc pb3" }, "Drive Frequency", React.createElement("div", { className: "flex items-center" }, React.createElement("div", { className: "fl w-10 pa2 pl0" }, driveFrequency), React.createElement("div", { className: "fl w-90 pa2 pl3" }, React.createElement(rc_slider_1.default, { min: 0, max: 2, marks: {
+                }, value: driveAmplitude, onChange: this.props.onDriveAmplitudeChange.bind(this) })))), React.createElement("div", { className: "tc pb3" }, "Drive Frequency", React.createElement("div", { className: "flex items-center" }, React.createElement("div", { className: "fl w-10 pa2 pl0" }, driveFrequency), React.createElement("div", { className: "fl w-90 pa2 pl3" }, React.createElement(rc_slider_1.default, { min: 0, max: 2, step: 0.001, marks: {
                     '0': '0',
                     '0.667': '0.667',
                     '1': '1',
                     '2': '2'
-                }, step: 0.001, value: driveFrequency, onChange: this.props.onDriveFrequencyChange.bind(this) })))), React.createElement("div", { className: "tc pb3" }, "Simulation Speed", React.createElement("div", { className: "flex items-center" }, React.createElement("div", { className: "fl w-10 pa2 pl0" }, simulationSpeed), React.createElement("div", { className: "fl w-90 pa2 pl3" }, React.createElement(rc_slider_1.default, { min: 1, max: 4, marks: {
+                }, value: driveFrequency, onChange: this.props.onDriveFrequencyChange.bind(this) })))), React.createElement("div", { className: "tc pb3" }, "Simulation Speed", React.createElement("div", { className: "flex items-center" }, React.createElement("div", { className: "fl w-10 pa2 pl0" }, simulationSpeed), React.createElement("div", { className: "fl w-90 pa2 pl3" }, React.createElement(rc_slider_1.default, { min: 1, max: 4, step: null, marks: {
                     1: 'Normal',
                     2: 'Double',
                     3: 'Fast',
                     4: 'Plotter'
-                }, step: null, value: this.state.simulationSpeedMode, onChange: this.onSimulationSpeedChange.bind(this) })))), React.createElement("div", { className: "tc pt4 pb3" }, "Interesting Presets", React.createElement("div", { className: "w-70 center pv3" }, React.createElement("select", { className: "w-100", onChange: this.onSelectPreset.bind(this) }, React.createElement("option", { value: "nothing" }), React.createElement("option", { value: "chaos1" }, "Chaos (0.5, 1.5, 0.667)")))), React.createElement("div", { className: "ph3 flex items-center" }, !this.props.running ? React.createElement("a", { className: "center f6 link dim br-pill ba bw1 ph3 pv2 mb2 dib dark-blue", onClick: this.props.run.bind(this) }, "Run Simulation") : React.createElement("a", { className: "center f6 link dim br-pill ba bw1 ph3 pv2 mb2 dib dark-blue", onClick: this.props.stop.bind(this) }, "Stop Simulation")));
+                }, value: this.state.simulationSpeedMode, onChange: this.onSimulationSpeedChange.bind(this) })))), React.createElement("div", { className: "tc pt4 pb3" }, "Interesting Presets", React.createElement("div", { className: "w-70 center pv3" }, React.createElement("select", { className: "w-100", onChange: this.onSelectPreset.bind(this) }, React.createElement("option", { value: "nothing" }), React.createElement("option", { value: "chaos1" }, "Chaos (0.5, 1.5, 0.667)")))), React.createElement("div", { className: "ph3 flex items-center" }, !this.props.running ? React.createElement("a", { className: "center f6 link dim br-pill ph3 pv2 mb2 dib white bg-dark-blue", onClick: this.props.run.bind(this) }, "Run Simulation") : React.createElement("a", { className: "center f6 link dim br-pill ba bw1 ph3 pv2 mb2 dib dark-blue", onClick: this.props.stop.bind(this) }, "Stop Simulation")));
         }
     }]);
 
@@ -33069,7 +33110,7 @@ function mapDispatchToProps(dispatch) {
             dispatch(simulation_1.changeDamping(Number(Math.round(Number(value + 'e3')) + 'e-3')));
         },
         onDriveAmplitudeChange: function onDriveAmplitudeChange(value) {
-            dispatch(simulation_1.changeDriveAmplitude(Number(Math.round(Number(value + 'e3')) + 'e-3')));
+            dispatch(simulation_1.changeDriveAmplitude(Number(Math.round(Number(value + 'e4')) + 'e-4')));
         },
         onDriveFrequencyChange: function onDriveFrequencyChange(value) {
             dispatch(simulation_1.changeDriveFrequency(Number(Math.round(Number(value + 'e4')) + 'e-4')));
