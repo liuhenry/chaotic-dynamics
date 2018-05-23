@@ -57,8 +57,7 @@ class Controls extends React.Component<Props, State> {
     this.props.onSimulationSpeedChange(value);
   }
 
-  onSelectPreset(event: Event) {
-    console.log(event.target.value);
+  onSelectPreset(event: HTMLSelectElement) {
     this.props.onPresetChange(event.target.value);
   }
 
@@ -246,13 +245,17 @@ function mapDispatchToProps(dispatch: Dispatch) {
     onSimulationSpeedChange(value: number) {
       switch(value) {
         case 1:
-          return dispatch(changeSimulationSpeed(1));
+          dispatch(changeSimulationSpeed(1));
+          break;
         case 2:
-          return dispatch(changeSimulationSpeed(2));
+          dispatch(changeSimulationSpeed(2));
+          break;
         case 3:
-          return dispatch(changeSimulationSpeed(5));
+          dispatch(changeSimulationSpeed(5));
+          break;
         case 4:
-          return dispatch(changeSimulationSpeed(1000));
+          dispatch(changeSimulationSpeed(1000));
+          break;
       }
     },
     onThetaChange(value: number) {

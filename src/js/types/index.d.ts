@@ -4,7 +4,7 @@ export interface BaseAction {
 }
 
 export interface ParameterAction extends BaseAction {
-  value: number;
+  value: number | string;
 }
 
 // State

@@ -61,35 +61,35 @@ function parameters(state = initialParameters, action: ParameterAction) {
     case Actions.CHANGE_SIMULATION_SPEED:
     return {
       ...state,
-      simulationSpeed: action.value
+      simulationSpeed: action.value as number
     };
     case Actions.CHANGE_START_THETA:
       return {
         ...state,
-        startTheta: action.value
+        startTheta: action.value as number
       };
     case Actions.CHANGE_START_OMEGA:
       return {
         ...state,
-        startOmega: action.value
+        startOmega: action.value as number
       };
     case Actions.CHANGE_DAMPING:
       return {
         ...state,
-        damping: action.value
+        damping: action.value as number
       };
     case Actions.CHANGE_DRIVE_AMPLITUDE:
       return {
         ...state,
-        driveAmplitude: action.value
+        driveAmplitude: action.value as number
       };
     case Actions.CHANGE_DRIVE_FREQUENCY:
       return {
         ...state,
-        driveFrequency: action.value
+        driveFrequency: action.value as number
       };
     case Actions.CHOOSE_PRESET:
-      const preset = presets(action.value);
+      const preset = presets(action.value as string);
       if (preset) {
         return {
           ...state,
