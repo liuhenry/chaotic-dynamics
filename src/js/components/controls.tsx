@@ -202,7 +202,25 @@ class Controls extends React.Component<Props, State> {
           <div className="w-70 center pv3">
             <select className="w-100" onChange={this.onSelectPreset.bind(this)}>
             <option value="nothing"></option>
-            <option value="chaos1">Chaos (0.5, 1.5, 0.667)</option>
+            <optgroup label="Simple Pendulum">
+              <option value="small-angle-approx">Small Angle Pendulum (SHM)</option>
+              <option value="jacobian-elliptical">Jacobian Elliptical</option>
+              <option value="separatrix">Separatrix</option>
+              <option value="full-rotations">Full Rotations</option>
+            </optgroup>
+            <optgroup label="Damped, Driven Pendulum (Drive Frequency 2/3)">
+              <option value="limit-cycle">Limit Cycle</option>
+              <option value="periodic1">Singly Periodic (0.5, 0.9, 0.667)</option>
+              <option value="periodic2">Doubly Periodic (0.5, 1.08, 0.667)</option>
+              <option value="chaos1">Chaos (0.5, 1.15, 0.667)</option>
+              <option value="periodic3">Singly Periodic (0.5, 1.35, 0.667)</option>
+              <option value="periodic4">Doubly Periodic (0.5, 1.45, 0.667)</option>
+              <option value="periodic5">Quadruply Periodic (0.5, 1.47, 0.667)</option>
+              <option value="chaos2">Chaos (0.5, 1.5, 0.667)</option>
+            </optgroup>
+            <optgroup label="Damped, Driven Pendulum">
+              <option value="periodic6">Chaos (0.5, 1.345, 0.7)</option>
+            </optgroup>
             </select>
           </div>
         </div>
