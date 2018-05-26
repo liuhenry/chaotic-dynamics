@@ -1,11 +1,11 @@
 #include <cmath>
-#include <queue>
 #include <tuple>
 #include <vector>
-using std::deque;
+#include <boost/circular_buffer.hpp>
 using std::get;
 using std::tuple;
 using std::vector;
+using boost::circular_buffer;
 
 #include "integrator/integrator.hh"
 
@@ -30,8 +30,8 @@ class Pendulum {
   int _t;
   double _drive;
   Integrator _integrator;
-  deque<tuple<double, double, double>> _phase_history;
-  deque<tuple<double, double>> _phase_slice;
+  circular_buffer<tuple<double, double, double>> _phase_history;
+  circular_buffer<tuple<double, double>> _phase_slice;
   static vector<double> eom(double, const vector<double> &,
                             const vector<double> &);
 
@@ -40,8 +40,8 @@ class Pendulum {
       : _t(0),
         _drive(0),
         _integrator(Pendulum::eom, {theta, omega, 0}),
-        _phase_history(),
-        _phase_slice() {}
+        _phase_history(10000),
+        _phase_slice(10000) {}
 
   double theta() const { return _integrator[0]; }
   double omega() const { return _integrator[1]; }
@@ -106,17 +106,11 @@ void Pendulum::tick(double speed, double damping, double amplitude,
 
     if (i % 5 == 0) {
       _phase_history.push_front({wrapped_theta, omega, wrapped_phi});
-      if (_phase_history.size() > 10000) {
-        _phase_history.pop_back();
-      }
     }
 
     const bool phiZero = std::abs(wrapped_phi) <= 1e-3;
     if (phiZero || get<2>(_phase_history.front()) > wrapped_phi) {
       _phase_slice.push_front({poincare_theta, omega});
-      if (_phase_slice.size() > 10000) {
-        _phase_slice.pop_back();
-      }
     }
   }
 }
