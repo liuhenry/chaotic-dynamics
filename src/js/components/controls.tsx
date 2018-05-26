@@ -219,7 +219,7 @@ class Controls extends React.Component<Props, State> {
               <option value="chaos2">Chaos (0.5, 1.5, 0.667)</option>
             </optgroup>
             <optgroup label="Damped, Driven Pendulum">
-              <option value="periodic6">Chaos (0.5, 1.345, 0.7)</option>
+              <option value="periodic6">Edge of Chaos (0.5, 1.345, 0.7)</option>
             </optgroup>
             </select>
           </div>
