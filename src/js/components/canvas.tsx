@@ -1,5 +1,6 @@
 import * as React from 'react';
-import { Dispatch, connect } from 'react-redux';
+import { connect } from 'react-redux';
+import { Dispatch } from 'redux';
 
 import { StoreState, ParameterState } from '../types/index';
 import { initialized, runSimulation, stopSimulation } from '../actions/simulation';
@@ -21,7 +22,7 @@ import PendulumVisualization from '../canvas/pendulum_visualization';
 };
 
 interface Props {
-  initialized: false;
+  initialized: boolean;
   running: boolean;
   speed: number;
   parameters: ParameterState;
@@ -49,9 +50,9 @@ class Canvas extends React.Component<Props, State> {
   componentDidUpdate(prevProps: Props) {
     if (this.props.initialized && this.state.canvas) {
       if (!this.state.model ||
-          this.props.parameters.startTheta !== prevProps.parameters.startTheta ||
-          this.props.parameters.startOmega !== prevProps.parameters.startOmega
-        ) {
+        this.props.parameters.startTheta !== prevProps.parameters.startTheta ||
+        this.props.parameters.startOmega !== prevProps.parameters.startOmega
+      ) {
 
         const model = new (window as any).Module.Pendulum(
           this.props.parameters.startTheta * Math.PI / 180,
@@ -109,7 +110,7 @@ class Canvas extends React.Component<Props, State> {
 }
 
 function mapStateToProps(state: StoreState) {
-  const {simulationSpeed: speed, ...parameters} = state.parameters;
+  const { simulationSpeed: speed, ...parameters } = state.parameters;
   return {
     initialized: state.simulation.initialized,
     running: state.simulation.running,

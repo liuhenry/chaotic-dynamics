@@ -1,5 +1,6 @@
 import * as React from 'react';
-import { Dispatch, connect } from 'react-redux';
+import { connect } from 'react-redux';
+import { Dispatch } from 'redux';
 import Slider from 'rc-slider';
 
 import { StoreState } from '../types/index';
@@ -57,7 +58,7 @@ class Controls extends React.Component<Props, State> {
     this.props.onSimulationSpeedChange(value);
   }
 
-  onSelectPreset(event: HTMLSelectElement) {
+  onSelectPreset(event: React.ChangeEvent<HTMLSelectElement>) {
     this.props.onPresetChange(event.target.value);
   }
 

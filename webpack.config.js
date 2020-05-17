@@ -23,7 +23,7 @@ module.exports = {
       {
         test: /\.tsx?$/,
         exclude: /node_modules/,
-        use: ['babel-loader', 'awesome-typescript-loader']
+        use: ['babel-loader', { loader: 'awesome-typescript-loader', options: { babelCore: "@babel/core" } }]
       },
       {
         test: /\.jsx?$/,
