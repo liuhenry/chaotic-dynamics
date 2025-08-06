@@ -1,7 +1,7 @@
 CC = emcc
 CXX = em++
-CFLAGS = -s WASM=1 -Os -I src/cpp/ -I /usr/local/include/
-CXXFLAGS = --std=c++1z --bind $(CFLAGS)
+CFLAGS = -s WASM=1 -Os -I src/cpp/ -I /usr/local/include/ -s USE_BOOST_HEADERS=1 -s WASM_BIGINT=1
+CXXFLAGS = -std=c++20 --bind $(CFLAGS)
 
 SRC_DIR = src/cpp
 

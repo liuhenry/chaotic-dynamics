@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { useState } from 'react';
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
 import Slider from 'rc-slider';
@@ -38,41 +39,40 @@ interface Props {
   onPresetChange(value: string): void;
 }
 
-interface State {
-  simulationSpeedMode: number;
-  presetValue?: string;
-}
+const Controls: React.FC<Props> = ({
+  running,
+  simulationSpeed,
+  theta,
+  omega,
+  damping,
+  driveAmplitude,
+  driveFrequency,
+  run,
+  stop,
+  onSimulationSpeedChange,
+  onThetaChange,
+  onOmegaChange,
+  onDampingChange,
+  onDriveAmplitudeChange,
+  onDriveFrequencyChange,
+  onPresetChange
+}) => {
+  const [simulationSpeedMode, setSimulationSpeedMode] = useState(1);
 
-class Controls extends React.Component<Props, State> {
-  constructor(props: Props, context?: any) {
-    super(props, context);
-    this.state = {
-      simulationSpeedMode: 1
-    };
-  }
+  const handleSimulationSpeedChange = (value: number) => {
+    setSimulationSpeedMode(value);
+    onSimulationSpeedChange(value);
+  };
 
-  onSimulationSpeedChange(value: number) {
-    this.setState({
-      simulationSpeedMode: value
-    });
-    this.props.onSimulationSpeedChange(value);
-  }
+  const handleSelectPreset = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    onPresetChange(event.target.value);
+  };
 
-  onSelectPreset(event: React.ChangeEvent<HTMLSelectElement>) {
-    this.props.onPresetChange(event.target.value);
-  }
-
-  render() {
-    const {
-      simulationSpeed,
-      theta, omega,
-      damping, driveAmplitude, driveFrequency
-    } = this.props;
-    return (
-      <div>
-        <div className="tc pb3">
-          Starting Angle
-          <div className="flex items-center">
+  return (
+    <div>
+      <div className="tc pb3">
+        Starting Angle
+        <div className="flex items-center">
           <div className="fl w-10 pa2 pl0">{theta}</div>
           <div className="fl w-90 pa2 pl3">
             <Slider
@@ -87,14 +87,14 @@ class Controls extends React.Component<Props, State> {
                 '180': '180'
               }}
               value={theta}
-              onChange={this.props.onThetaChange.bind(this)}
+              onChange={onThetaChange}
             />
-            </div>
           </div>
         </div>
-        <div className="tc pb3">
-          Starting Angular Velocity
-          <div className="flex items-center">
+      </div>
+      <div className="tc pb3">
+        Starting Angular Velocity
+        <div className="flex items-center">
           <div className="fl w-10 pa2 pl0">{omega}</div>
           <div className="fl w-90 pa2 pl3">
             <Slider
@@ -109,14 +109,14 @@ class Controls extends React.Component<Props, State> {
                 '180': '180',
               }}
               value={omega}
-              onChange={this.props.onOmegaChange.bind(this)}
+              onChange={onOmegaChange}
             />
-            </div>
           </div>
         </div>
-        <div className="tc pb3">
-          Damping
-          <div className="flex items-center">
+      </div>
+      <div className="tc pb3">
+        Damping
+        <div className="flex items-center">
           <div className="fl w-10 pa2 pl0">{damping}</div>
           <div className="fl w-90 pa2 pl3">
             <Slider
@@ -129,14 +129,14 @@ class Controls extends React.Component<Props, State> {
                 '1': '1'
               }}
               value={damping}
-              onChange={this.props.onDampingChange.bind(this)}
+              onChange={onDampingChange}
             />
           </div>
         </div>
       </div>
       <div className="tc pb3">
-          Drive Amplitude
-          <div className="flex items-center">
+        Drive Amplitude
+        <div className="flex items-center">
           <div className="fl w-10 pa2 pl0">{driveAmplitude}</div>
           <div className="fl w-90 pa2 pl3">
             <Slider
@@ -151,14 +151,14 @@ class Controls extends React.Component<Props, State> {
                 '2': '2'
               }}
               value={driveAmplitude}
-              onChange={this.props.onDriveAmplitudeChange.bind(this)}
+              onChange={onDriveAmplitudeChange}
             />
-            </div>
           </div>
         </div>
-        <div className="tc pb3">
-          Drive Frequency
-          <div className="flex items-center">
+      </div>
+      <div className="tc pb3">
+        Drive Frequency
+        <div className="flex items-center">
           <div className="fl w-10 pa2 pl0">{driveFrequency}</div>
           <div className="fl w-90 pa2 pl3">
             <Slider
@@ -172,14 +172,14 @@ class Controls extends React.Component<Props, State> {
                 '2': '2'
               }}
               value={driveFrequency}
-              onChange={this.props.onDriveFrequencyChange.bind(this)}
+              onChange={onDriveFrequencyChange}
             />
-            </div>
           </div>
         </div>
-        <div className="tc pb3">
-          Simulation Speed
-          <div className="flex items-center">
+      </div>
+      <div className="tc pb3">
+        Simulation Speed
+        <div className="flex items-center">
           <div className="fl w-10 pa2 pl0">{simulationSpeed}</div>
           <div className="fl w-90 pa2 pl3">
             <Slider
@@ -192,16 +192,16 @@ class Controls extends React.Component<Props, State> {
                 3: 'Fast',
                 4: 'Plotter'
               }}
-              value={this.state.simulationSpeedMode}
-              onChange={this.onSimulationSpeedChange.bind(this)}
+              value={simulationSpeedMode}
+              onChange={handleSimulationSpeedChange}
             />
-            </div>
           </div>
         </div>
-        <div className="tc pt4 pb3">
-          Interesting Presets
-          <div className="w-70 center pv3">
-            <select className="w-100" onChange={this.onSelectPreset.bind(this)}>
+      </div>
+      <div className="tc pt4 pb3">
+        Interesting Presets
+        <div className="w-70 center pv3">
+          <select className="w-100" onChange={handleSelectPreset}>
             <option value="nothing"></option>
             <optgroup label="Simple Pendulum">
               <option value="small-angle-approx">Small Angle Pendulum (SHM)</option>
@@ -222,24 +222,23 @@ class Controls extends React.Component<Props, State> {
             <optgroup label="Damped, Driven Pendulum">
               <option value="periodic6">Edge of Chaos (0.5, 1.345, 0.7)</option>
             </optgroup>
-            </select>
-          </div>
+          </select>
         </div>
-        <div className="ph3 flex items-center">
-          {!this.props.running ?
+      </div>
+      <div className="ph3 flex items-center">
+        {!running ?
           <a className="center f6 link dim br-pill ph3 pv2 mb2 dib white bg-dark-blue"
-            onClick={this.props.run.bind(this)}>
+            onClick={run}>
             Run Simulation
           </a> :
           <a className="center f6 link dim br-pill ba bw1 ph3 pv2 mb2 dib dark-blue"
-            onClick={this.props.stop.bind(this)}>
+            onClick={stop}>
             Stop Simulation
           </a>}
-        </div>
+      </div>
     </div>
-    );
-  }
-}
+  );
+};
 
 function mapStateToProps(state: StoreState) {
   return {
@@ -298,4 +297,4 @@ function mapDispatchToProps(dispatch: Dispatch) {
   };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(Controls)
+export default connect(mapStateToProps, mapDispatchToProps)(Controls);
