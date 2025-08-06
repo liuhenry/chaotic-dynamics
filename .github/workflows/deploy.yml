@@ -27,7 +27,7 @@ jobs:
       run: npm ci
     
     - name: Build C++ WASM
-      run: make clean && make
+      run: make
     
     - name: Build project
       run: npm run build

@@ -11,10 +11,11 @@ OBJECTS := $(patsubst %.cc, %.o, $(SOURCES))
 TARGET = dist/assets/js/pendulum-wasm
 
 $(TARGET).js: $(OBJECTS)
+	mkdir -p dist/assets/js
 	$(CXX) $(CXXFLAGS) $^ -o $@
 
 %.o: %.cpp
 	$(CXX) $(CXXFLAGS) -c $^ -o $@
 
 clean:
-	rm $(OBJECTS) $(TARGET).js $(TARGET).wasm
+	rm -f $(OBJECTS) $(TARGET).js $(TARGET).wasm
