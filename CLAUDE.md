@@ -41,10 +41,15 @@ make
 
 #### 3. Build JavaScript/TypeScript
 ```bash
+# Run TypeScript type checking first
+npx tsc --noEmit
+
+# Then build the bundle
 npm run build
 ```
 
 **Status**: ⚠️ Partial success
+- **IMPORTANT**: Always run `npx tsc --noEmit` before committing to catch TypeScript errors
 - Build created `bundle.js` and `bundle.js.map` in `dist/assets/js/`
 - Error occurred due to Node.js version incompatibility with Webpack 4
 - Error: "digital envelope routines::unsupported" - common with Webpack 4 on newer Node.js versions
@@ -56,6 +61,34 @@ The project deploys from the `gh-pages` branch which contains:
 - `index.html` - Main entry point
 - `assets/js/` - JavaScript bundles and WebAssembly files
 - `assets/css/` - Tachyons CSS framework
+
+## Pre-Commit Checklist
+
+**IMPORTANT**: Before committing any changes, always run:
+
+1. **TypeScript type checking**:
+   ```bash
+   npx tsc --noEmit
+   ```
+   Fix any type errors before proceeding.
+
+2. **Build C++ components** (if modified):
+   ```bash
+   make clean && make
+   cp dist/assets/js/pendulum-wasm.* public/assets/js/
+   ```
+
+3. **Build JavaScript bundle** (if TypeScript modified):
+   ```bash
+   npm run build
+   cp dist/assets/js/bundle.* public/assets/js/
+   ```
+
+4. **Test the application**:
+   ```bash
+   npx http-server public -p 8080
+   ```
+   Open http://localhost:8080 and verify functionality.
 
 ## Known Issues
 

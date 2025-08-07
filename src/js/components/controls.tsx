@@ -87,7 +87,7 @@ const Controls: React.FC<Props> = ({
                 '180': '180'
               }}
               value={theta}
-              onChange={onThetaChange}
+              onChange={(value) => onThetaChange(value as number)}
             />
           </div>
         </div>
@@ -109,7 +109,7 @@ const Controls: React.FC<Props> = ({
                 '180': '180',
               }}
               value={omega}
-              onChange={onOmegaChange}
+              onChange={(value) => onOmegaChange(value as number)}
             />
           </div>
         </div>
@@ -129,7 +129,7 @@ const Controls: React.FC<Props> = ({
                 '1': '1'
               }}
               value={damping}
-              onChange={onDampingChange}
+              onChange={(value) => onDampingChange(value as number)}
             />
           </div>
         </div>
@@ -151,7 +151,7 @@ const Controls: React.FC<Props> = ({
                 '2': '2'
               }}
               value={driveAmplitude}
-              onChange={onDriveAmplitudeChange}
+              onChange={(value) => onDriveAmplitudeChange(value as number)}
             />
           </div>
         </div>
@@ -172,7 +172,7 @@ const Controls: React.FC<Props> = ({
                 '2': '2'
               }}
               value={driveFrequency}
-              onChange={onDriveFrequencyChange}
+              onChange={(value) => onDriveFrequencyChange(value as number)}
             />
           </div>
         </div>
@@ -193,7 +193,7 @@ const Controls: React.FC<Props> = ({
                 4: 'Plotter'
               }}
               value={simulationSpeedMode}
-              onChange={handleSimulationSpeedChange}
+              onChange={(value) => handleSimulationSpeedChange(value as number)}
             />
           </div>
         </div>
