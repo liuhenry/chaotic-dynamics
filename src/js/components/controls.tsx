@@ -87,7 +87,7 @@ const Controls: React.FC<Props> = ({
                 '180': '180'
               }}
               value={theta}
-              onChange={(value) => onThetaChange(value as number)}
+              onChange={(value) => onThetaChange(Array.isArray(value) ? value[0] : value)}
             />
           </div>
         </div>
@@ -109,7 +109,7 @@ const Controls: React.FC<Props> = ({
                 '180': '180',
               }}
               value={omega}
-              onChange={(value) => onOmegaChange(value as number)}
+              onChange={(value) => onOmegaChange(Array.isArray(value) ? value[0] : value)}
             />
           </div>
         </div>
@@ -129,7 +129,7 @@ const Controls: React.FC<Props> = ({
                 '1': '1'
               }}
               value={damping}
-              onChange={(value) => onDampingChange(value as number)}
+              onChange={(value) => onDampingChange(Array.isArray(value) ? value[0] : value)}
             />
           </div>
         </div>
@@ -151,7 +151,7 @@ const Controls: React.FC<Props> = ({
                 '2': '2'
               }}
               value={driveAmplitude}
-              onChange={(value) => onDriveAmplitudeChange(value as number)}
+              onChange={(value) => onDriveAmplitudeChange(Array.isArray(value) ? value[0] : value)}
             />
           </div>
         </div>
@@ -172,7 +172,7 @@ const Controls: React.FC<Props> = ({
                 '2': '2'
               }}
               value={driveFrequency}
-              onChange={(value) => onDriveFrequencyChange(value as number)}
+              onChange={(value) => onDriveFrequencyChange(Array.isArray(value) ? value[0] : value)}
             />
           </div>
         </div>
@@ -193,7 +193,7 @@ const Controls: React.FC<Props> = ({
                 4: 'Plotter'
               }}
               value={simulationSpeedMode}
-              onChange={(value) => handleSimulationSpeedChange(value as number)}
+              onChange={(value) => handleSimulationSpeedChange(Array.isArray(value) ? value[0] : value)}
             />
           </div>
         </div>
