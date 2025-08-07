@@ -68,23 +68,37 @@ The project deploys from the `gh-pages` branch which contains:
 
 1. **TypeScript type checking**:
    ```bash
-   npx tsc --noEmit
+   npm run typecheck
    ```
    Fix any type errors before proceeding.
 
-2. **Build C++ components** (if modified):
+2. **ESLint**:
+   ```bash
+   npm run lint
+   ```
+   Or to auto-fix issues:
+   ```bash
+   npm run lint:fix
+   ```
+
+3. **Prettier formatting**:
+   ```bash
+   npm run format
+   ```
+
+4. **Build C++ components** (if modified):
    ```bash
    make clean && make
    cp dist/assets/js/pendulum-wasm.* public/assets/js/
    ```
 
-3. **Build JavaScript bundle** (if TypeScript modified):
+5. **Build JavaScript bundle** (if TypeScript modified):
    ```bash
    npm run build
    cp dist/assets/js/bundle.* public/assets/js/
    ```
 
-4. **Test the application**:
+6. **Test the application**:
    ```bash
    npx http-server public -p 8080
    ```

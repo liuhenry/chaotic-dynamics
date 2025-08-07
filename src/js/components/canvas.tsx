@@ -1,16 +1,13 @@
-import * as React from 'react';
-import { useEffect, useRef, useState } from 'react';
-import { connect } from 'react-redux';
-import { Dispatch } from 'redux';
+import React, { useEffect, useRef, useState } from 'react';
 
-import { StoreState, ParameterState } from '../types/index';
-import { initialized, stopSimulation } from '../actions/simulation';
-import store from '../stores/simulation';
+import { useAppSelector, useAppDispatch } from '../store/hooks';
+import { ParameterState } from '../types/index';
+import { initialized, stopSimulation } from '../store/simulationSlice';
+import { store } from '../store/store';
 import PendulumVisualization from '../canvas/pendulum_visualization';
 
-
 // Listen for WASM initialization
-if ((window as any).Module?.initialized) {
+if (window.Module?.initialized) {
   // Already initialized
   store.dispatch(initialized());
 } else {
@@ -20,92 +17,90 @@ if ((window as any).Module?.initialized) {
   });
 }
 
-interface Props {
-  initialized: boolean;
-  running: boolean;
-  speed: number;
-  parameters: ParameterState;
-  stop(): void;
-}
+const Canvas: React.FC = () => {
+  const dispatch = useAppDispatch();
 
-const Canvas: React.FC<Props> = ({ initialized, running, speed, parameters, stop }) => {
+  // Select state from store
+  const isInitialized = useAppSelector((state) => state.simulation.initialized);
+  const running = useAppSelector((state) => state.simulation.running);
+  const speed = useAppSelector((state) => state.simulation.simulationSpeed);
+  const parameters: ParameterState = useAppSelector((state) => ({
+    simulationSpeed: state.simulation.simulationSpeed,
+    startTheta: state.simulation.startTheta,
+    startOmega: state.simulation.startOmega,
+    damping: state.simulation.damping,
+    driveAmplitude: state.simulation.driveAmplitude,
+    driveFrequency: state.simulation.driveFrequency,
+  }));
+
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [model, setModel] = useState<any>(null);
+  const [model, setModel] = useState<module.PendulumSimulation | null>(null);
   const [simulation, setSimulation] = useState<PendulumVisualization | null>(null);
   const prevParamsRef = useRef<ParameterState>(parameters);
   const prevSpeedRef = useRef<number>(speed);
   const prevRunningRef = useRef<boolean>(running);
 
   useEffect(() => {
-    if (initialized && canvasRef.current) {
-      if (!model ||
+    if (isInitialized && canvasRef.current) {
+      if (
+        !model ||
         parameters.startTheta !== prevParamsRef.current.startTheta ||
         parameters.startOmega !== prevParamsRef.current.startOmega
       ) {
-        const newModel = new (window as any).Module.Pendulum(
-          parameters.startTheta * Math.PI / 180,
-          parameters.startOmega * Math.PI / 180
+        const newModel = new window.Module!.Pendulum(
+          (parameters.startTheta * Math.PI) / 180,
+          (parameters.startOmega * Math.PI) / 180
         );
 
         if (simulation) {
-          simulation.stop();
-          stop();
+          simulation.changeModel(newModel);
         }
 
-        const newSimulation = new PendulumVisualization(canvasRef.current, newModel);
-        const { damping, driveAmplitude, driveFrequency } = parameters;
-        newSimulation.setSpeed(speed);
-        newSimulation.setParameters(damping, driveAmplitude, driveFrequency);
-        newSimulation.initialize();
-        
         setModel(newModel);
+      }
+
+      if (canvasRef.current && model && !simulation) {
+        const newSimulation = new PendulumVisualization(canvasRef.current, model);
+        newSimulation.initialize();
         setSimulation(newSimulation);
-        prevParamsRef.current = parameters;
-        return;
       }
 
       if (simulation) {
-        if (speed !== prevSpeedRef.current) {
-          simulation.setSpeed(speed);
-          prevSpeedRef.current = speed;
-        }
-        
-        if (JSON.stringify(parameters) !== JSON.stringify(prevParamsRef.current)) {
-          const { damping, driveAmplitude, driveFrequency } = parameters;
-          simulation.setParameters(damping, driveAmplitude, driveFrequency);
-          prevParamsRef.current = parameters;
+        const parametersChangedString = JSON.stringify(parameters);
+        const prevParametersChangedString = JSON.stringify(prevParamsRef.current);
+
+        if (
+          parametersChangedString !== prevParametersChangedString ||
+          speed !== prevSpeedRef.current ||
+          running !== prevRunningRef.current
+        ) {
+          simulation.updateParameters(parameters, speed, running);
         }
 
-        if (running) {
-          if (!prevRunningRef.current) {
-            simulation.start();
-          }
-        } else {
-          simulation.stop();
-        }
+        prevParamsRef.current = parameters;
+        prevSpeedRef.current = speed;
         prevRunningRef.current = running;
       }
     }
-  }, [initialized, running, speed, parameters, model, simulation, stop]);
+  }, [isInitialized, model, simulation, parameters, speed, running]);
 
-  return <canvas ref={canvasRef} id="canvas" width="1600px" height="1000px" className="fl w-100 ba"></canvas>;
+  useEffect(() => {
+    return () => {
+      if (simulation) {
+        dispatch(stopSimulation());
+      }
+    };
+  }, [simulation, dispatch]);
+
+  return (
+    <canvas
+      ref={canvasRef}
+      id="canvas"
+      width="1600px"
+      height="1000px"
+      className="fl w-100 ba"
+    ></canvas>
+  );
 };
 
-function mapStateToProps(state: StoreState) {
-  return {
-    initialized: state.simulation.initialized,
-    running: state.simulation.running,
-    speed: state.parameters.simulationSpeed,
-    parameters: state.parameters
-  };
-}
-
-function mapDispatchToProps(dispatch: Dispatch) {
-  return {
-    stop() {
-      dispatch(stopSimulation());
-    }
-  };
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(Canvas);
+export default React.memo(Canvas);

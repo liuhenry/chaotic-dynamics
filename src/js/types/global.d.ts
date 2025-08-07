@@ -15,13 +15,9 @@ declare namespace module {
   }
 }
 
-declare global {
-  interface Window {
-    Module?: {
-      initialized?: boolean;
-      Pendulum: new (theta: number, omega: number) => module.PendulumSimulation;
-    };
-  }
+interface Window {
+  Module?: {
+    initialized?: boolean;
+    Pendulum: new (theta: number, omega: number) => module.PendulumSimulation;
+  };
 }
-
-export {};

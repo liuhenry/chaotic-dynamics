@@ -1,19 +1,4 @@
-// Actions
-export interface BaseAction {
-  type: string;
-  [key: string]: any;
-}
-
-export interface ParameterAction extends BaseAction {
-  value: number | string;
-}
-
-// State
-interface simulationState {
-  initialized: boolean;
-  running: boolean;
-}
-
+// State types for the application
 export interface ParameterState {
   simulationSpeed: number;
   startTheta: number;
@@ -21,9 +6,4 @@ export interface ParameterState {
   damping: number;
   driveAmplitude: number;
   driveFrequency: number;
-}
-
-export interface StoreState {
-  simulation: simulationState;
-  parameters: ParameterState;
 }

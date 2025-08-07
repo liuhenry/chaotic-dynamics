@@ -1,10 +1,7 @@
-import * as React from 'react';
-import { useState } from 'react';
-import { connect } from 'react-redux';
-import { Dispatch } from 'redux';
+import React, { useState, useCallback } from 'react';
 import Slider from 'rc-slider';
 
-import { StoreState } from '../types/index';
+import { useAppSelector, useAppDispatch } from '../store/hooks';
 import {
   changeSimulationSpeed,
   changeStartTheta,
@@ -14,59 +11,92 @@ import {
   changeDriveFrequency,
   runSimulation,
   stopSimulation,
-  choosePreset
-} from '../actions/simulation';
+  choosePreset,
+} from '../store/simulationSlice';
 
 import 'rc-slider/assets/index.css';
 
+const Controls: React.FC = () => {
+  const dispatch = useAppDispatch();
 
-interface Props {
-  running: boolean;
-  simulationSpeed: number;
-  theta: number;
-  omega: number;
-  damping: number;
-  driveAmplitude: number;
-  driveFrequency: number;
-  run(): void;
-  stop(): void;
-  onSimulationSpeedChange(value: number): void;
-  onThetaChange(value: number): void;
-  onOmegaChange(value: number): void;
-  onDampingChange(value: number): void;
-  onDriveAmplitudeChange(value: number): void;
-  onDriveFrequencyChange(value: number): void;
-  onPresetChange(value: string): void;
-}
+  // Select state from store
+  const running = useAppSelector((state) => state.simulation.running);
+  const simulationSpeed = useAppSelector((state) => state.simulation.simulationSpeed);
+  const theta = useAppSelector((state) => state.simulation.startTheta);
+  const omega = useAppSelector((state) => state.simulation.startOmega);
+  const damping = useAppSelector((state) => state.simulation.damping);
+  const driveAmplitude = useAppSelector((state) => state.simulation.driveAmplitude);
+  const driveFrequency = useAppSelector((state) => state.simulation.driveFrequency);
 
-const Controls: React.FC<Props> = ({
-  running,
-  simulationSpeed,
-  theta,
-  omega,
-  damping,
-  driveAmplitude,
-  driveFrequency,
-  run,
-  stop,
-  onSimulationSpeedChange,
-  onThetaChange,
-  onOmegaChange,
-  onDampingChange,
-  onDriveAmplitudeChange,
-  onDriveFrequencyChange,
-  onPresetChange
-}) => {
   const [simulationSpeedMode, setSimulationSpeedMode] = useState(1);
 
-  const handleSimulationSpeedChange = (value: number) => {
-    setSimulationSpeedMode(value);
-    onSimulationSpeedChange(value);
-  };
+  const handleSimulationSpeedChange = useCallback(
+    (value: number) => {
+      setSimulationSpeedMode(value);
+      // Map slider position to actual speed values
+      const speedMap: { [key: number]: number } = {
+        1: 1,
+        2: 2,
+        3: 5,
+        4: 1000,
+      };
+      dispatch(changeSimulationSpeed(speedMap[value] || 1));
+    },
+    [dispatch]
+  );
 
-  const handleSelectPreset = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    onPresetChange(event.target.value);
-  };
+  const handleSelectPreset = useCallback(
+    (event: React.ChangeEvent<HTMLSelectElement>) => {
+      dispatch(choosePreset(event.target.value));
+    },
+    [dispatch]
+  );
+
+  const handleThetaChange = useCallback(
+    (value: number | number[]) => {
+      dispatch(changeStartTheta(Array.isArray(value) ? value[0] : value));
+    },
+    [dispatch]
+  );
+
+  const handleOmegaChange = useCallback(
+    (value: number | number[]) => {
+      dispatch(changeStartOmega(Array.isArray(value) ? value[0] : value));
+    },
+    [dispatch]
+  );
+
+  const handleDampingChange = useCallback(
+    (value: number | number[]) => {
+      const numValue = Array.isArray(value) ? value[0] : value;
+      dispatch(changeDamping(Number(Math.round(Number(numValue + 'e3')) + 'e-3')));
+    },
+    [dispatch]
+  );
+
+  const handleDriveAmplitudeChange = useCallback(
+    (value: number | number[]) => {
+      const numValue = Array.isArray(value) ? value[0] : value;
+      dispatch(changeDriveAmplitude(Number(Math.round(Number(numValue + 'e4')) + 'e-4')));
+    },
+    [dispatch]
+  );
+
+  const handleDriveFrequencyChange = useCallback(
+    (value: number | number[]) => {
+      const numValue = Array.isArray(value) ? value[0] : value;
+      dispatch(changeDriveFrequency(Number(Math.round(Number(numValue + 'e4')) + 'e-4')));
+    },
+    [dispatch]
+  );
+
+  const handleRunSimulation = useCallback(() => {
+    dispatch(runSimulation());
+  }, [dispatch]);
+
+  const handleStopSimulation = useCallback(() => {
+    dispatch(stopSimulation());
+  }, [dispatch]);
 
   return (
     <div>
@@ -84,10 +114,10 @@ const Controls: React.FC<Props> = ({
                 '-90': '-90',
                 '0': '0',
                 '90': '90',
-                '180': '180'
+                '180': '180',
               }}
               value={theta}
-              onChange={(value) => onThetaChange(Array.isArray(value) ? value[0] : value)}
+              onChange={handleThetaChange}
             />
           </div>
         </div>
@@ -109,7 +139,7 @@ const Controls: React.FC<Props> = ({
                 '180': '180',
               }}
               value={omega}
-              onChange={(value) => onOmegaChange(Array.isArray(value) ? value[0] : value)}
+              onChange={handleOmegaChange}
             />
           </div>
         </div>
@@ -126,10 +156,10 @@ const Controls: React.FC<Props> = ({
               marks={{
                 '0': '0',
                 '0.5': '0.5',
-                '1': '1'
+                '1': '1',
               }}
               value={damping}
-              onChange={(value) => onDampingChange(Array.isArray(value) ? value[0] : value)}
+              onChange={handleDampingChange}
             />
           </div>
         </div>
@@ -148,10 +178,10 @@ const Controls: React.FC<Props> = ({
                 '0.5': '0.5',
                 '1': '1',
                 '1.5': '1.5',
-                '2': '2'
+                '2': '2',
               }}
               value={driveAmplitude}
-              onChange={(value) => onDriveAmplitudeChange(Array.isArray(value) ? value[0] : value)}
+              onChange={handleDriveAmplitudeChange}
             />
           </div>
         </div>
@@ -169,10 +199,10 @@ const Controls: React.FC<Props> = ({
                 '0': '0',
                 '0.667': '0.667',
                 '1': '1',
-                '2': '2'
+                '2': '2',
               }}
               value={driveFrequency}
-              onChange={(value) => onDriveFrequencyChange(Array.isArray(value) ? value[0] : value)}
+              onChange={handleDriveFrequencyChange}
             />
           </div>
         </div>
@@ -190,10 +220,12 @@ const Controls: React.FC<Props> = ({
                 1: 'Normal',
                 2: 'Double',
                 3: 'Fast',
-                4: 'Plotter'
+                4: 'Plotter',
               }}
               value={simulationSpeedMode}
-              onChange={(value) => handleSimulationSpeedChange(Array.isArray(value) ? value[0] : value)}
+              onChange={(value) =>
+                handleSimulationSpeedChange(Array.isArray(value) ? value[0] : value)
+              }
             />
           </div>
         </div>
@@ -218,83 +250,30 @@ const Controls: React.FC<Props> = ({
               <option value="periodic4">Doubly Periodic (0.5, 1.45, 0.667)</option>
               <option value="periodic5">Quadruply Periodic (0.5, 1.47, 0.667)</option>
               <option value="chaos2">Chaos (0.5, 1.5, 0.667)</option>
-            </optgroup>
-            <optgroup label="Damped, Driven Pendulum">
-              <option value="periodic6">Edge of Chaos (0.5, 1.345, 0.7)</option>
+              <option value="periodic6">Singly Periodic (0.5, 1.345, 0.7)</option>
             </optgroup>
           </select>
         </div>
       </div>
-      <div className="ph3 flex items-center">
-        {!running ?
-          <a className="center f6 link dim br-pill ph3 pv2 mb2 dib white bg-dark-blue"
-            onClick={run}>
+      <div className="tc">
+        {!running ? (
+          <a
+            className="center f6 link dim br-pill ph3 pv2 mb2 dib white bg-dark-blue"
+            onClick={handleRunSimulation}
+          >
             Run Simulation
-          </a> :
-          <a className="center f6 link dim br-pill ba bw1 ph3 pv2 mb2 dib dark-blue"
-            onClick={stop}>
+          </a>
+        ) : (
+          <a
+            className="center f6 link dim br-pill ba bw1 ph3 pv2 mb2 dib dark-blue"
+            onClick={handleStopSimulation}
+          >
             Stop Simulation
-          </a>}
+          </a>
+        )}
       </div>
     </div>
   );
 };
 
-function mapStateToProps(state: StoreState) {
-  return {
-    running: state.simulation.running,
-    simulationSpeed: state.parameters.simulationSpeed,
-    theta: state.parameters.startTheta,
-    omega: state.parameters.startOmega,
-    damping: state.parameters.damping,
-    driveAmplitude: state.parameters.driveAmplitude,
-    driveFrequency: state.parameters.driveFrequency
-  };
-}
-
-function mapDispatchToProps(dispatch: Dispatch) {
-  return {
-    run() {
-      dispatch(runSimulation());
-    },
-    stop() {
-      dispatch(stopSimulation());
-    },
-    onSimulationSpeedChange(value: number) {
-      switch(value) {
-        case 1:
-          dispatch(changeSimulationSpeed(1));
-          break;
-        case 2:
-          dispatch(changeSimulationSpeed(2));
-          break;
-        case 3:
-          dispatch(changeSimulationSpeed(5));
-          break;
-        case 4:
-          dispatch(changeSimulationSpeed(1000));
-          break;
-      }
-    },
-    onThetaChange(value: number) {
-      dispatch(changeStartTheta(value));
-    },
-    onOmegaChange(value: number) {
-      dispatch(changeStartOmega(value));
-    },
-    onDampingChange(value: number) {
-      dispatch(changeDamping(Number(Math.round(Number(value + 'e3')) + 'e-3')));
-    },
-    onDriveAmplitudeChange(value: number) {
-      dispatch(changeDriveAmplitude(Number(Math.round(Number(value + 'e4')) + 'e-4')));
-    },
-    onDriveFrequencyChange(value: number) {
-      dispatch(changeDriveFrequency(Number(Math.round(Number(value + 'e4')) + 'e-4')));
-    },
-    onPresetChange(value: string) {
-      dispatch(choosePreset(value));
-    }
-  };
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(Controls);
+export default React.memo(Controls);

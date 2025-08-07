@@ -4,6 +4,7 @@ import { resolve } from 'path';
 
 export default defineConfig({
   plugins: [react()],
+  base: '/chaotic-dynamics/',
   root: '.',
   publicDir: 'public',
   build: {

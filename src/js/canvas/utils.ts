@@ -1,5 +1,3 @@
-
-
 export function arcArrow(
   ctx: CanvasRenderingContext2D,
   x: number,
@@ -15,20 +13,20 @@ export function arcArrow(
 
   if (startAngle !== endAngle) {
     const scale = radius / 10;
-    const ex = Math.cos(endAngle)*radius+x;
-    const ey = Math.sin(endAngle)*radius+y;
-    const tangentAngle = Math.atan2(x-ex, ey-y);
-    var x1, y1, x2, y2;
-    if (anticlockwise){
-      x1 = ex-scale*Math.cos(tangentAngle+0.5);
-      y1 = ey-scale*Math.sin(tangentAngle+0.5);
-      x2 = ex-scale*Math.cos(tangentAngle-0.5);
-      y2 = ey-scale*Math.sin(tangentAngle-0.5);
+    const ex = Math.cos(endAngle) * radius + x;
+    const ey = Math.sin(endAngle) * radius + y;
+    const tangentAngle = Math.atan2(x - ex, ey - y);
+    let x1, y1, x2, y2;
+    if (anticlockwise) {
+      x1 = ex - scale * Math.cos(tangentAngle + 0.5);
+      y1 = ey - scale * Math.sin(tangentAngle + 0.5);
+      x2 = ex - scale * Math.cos(tangentAngle - 0.5);
+      y2 = ey - scale * Math.sin(tangentAngle - 0.5);
     } else {
-      x1 = ex+scale*Math.cos(tangentAngle+0.5);
-      y1 = ey+scale*Math.sin(tangentAngle+0.5);
-      x2 = ex+scale*Math.cos(tangentAngle-0.5);
-      y2 = ey+scale*Math.sin(tangentAngle-0.5);
+      x1 = ex + scale * Math.cos(tangentAngle + 0.5);
+      y1 = ey + scale * Math.sin(tangentAngle + 0.5);
+      x2 = ex + scale * Math.cos(tangentAngle - 0.5);
+      y2 = ey + scale * Math.sin(tangentAngle - 0.5);
     }
     ctx.beginPath();
     ctx.moveTo(ex, ey);
