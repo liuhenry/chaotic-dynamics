@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en-us">
+<head>
+  <title>Pendulums</title>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <script type="module" crossorigin src="/chaotic-dynamics/assets/main-D1HMv-e2.js"></script>
+  <link rel="stylesheet" crossorigin href="/chaotic-dynamics/assets/main-DiZjvvLC.css">
+</head>
+<body class="w-100 sans-serif">
+  <main id="root"></main>
+  <script>
+    // Configure Module before loading WASM
+    var Module = {
+      locateFile: function(file) {
+        return './assets/js/' + file;
+      },
+      onRuntimeInitialized: function() {
+        console.log('WASM Runtime initialized');
+        Module.initialized = true;
+        // Dispatch event for React to know WASM is ready
+        window.dispatchEvent(new Event('wasmInitialized'));
+      }
+    };
+  </script>
+  <script src="./assets/js/pendulum-wasm.js"></script>
+</body>
+</html>
