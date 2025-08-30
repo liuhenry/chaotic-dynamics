@@ -79,7 +79,7 @@ export default class Canvas {
     this.ctx.lineTo(this.width, this.height / 2);
     this.ctx.stroke();
 
-    this.ctx.font = '20px sans-serif';
+    this.ctx.font = '20px TX-02';
     this.ctx.fillText('Phase Portrait', this.upperRight.left + 5, this.upperRight.top + 20);
     this.ctx.fillText('Poincaré Map (ϕ = 0)', this.lowerRight.left + 5, this.lowerRight.top + 20);
   }
